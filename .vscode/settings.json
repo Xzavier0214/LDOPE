@@ -1,0 +1,6 @@
+{
+    "python.linting.pep8Enabled": true,
+    "python.linting.enabled": true,
+    "python.pythonPath": "/Users/zengxin/anaconda3/envs/ldope/bin/python",
+    "python.formatting.provider": "yapf"
+}
