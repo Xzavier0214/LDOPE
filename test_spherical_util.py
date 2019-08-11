@@ -15,36 +15,41 @@ print(ldope)
 
 #%% 测试导出常量
 get_spherical_state_size = ldope.get_spherical_state_size
-get_spherical_state_size.restype = ctypes.c_size_t
-spherical_state_size = get_spherical_state_size()
+spherical_state_size_c = ctypes.c_size_t()
+get_spherical_state_size(ctypes.byref(spherical_state_size_c))
+spherical_state_size = spherical_state_size_c.value
 
 print('spherical state size:')
 print(spherical_state_size)
 
 get_spherical_control_size = ldope.get_spherical_control_size
-get_spherical_control_size.restype = ctypes.c_size_t
-spherical_control_size = get_spherical_control_size()
+spherical_control_size_c = ctypes.c_size_t()
+get_spherical_control_size(ctypes.byref(spherical_control_size_c))
+spherical_control_size = spherical_control_size_c.value
 
 print('spherical control size:')
 print(spherical_control_size)
 
 get_spherical_ext_state_size = ldope.get_spherical_ext_state_size
-get_spherical_ext_state_size.restype = ctypes.c_size_t
-spherical_ext_state_size = get_spherical_ext_state_size()
+spherical_ext_state_size_c = ctypes.c_size_t()
+get_spherical_ext_state_size(ctypes.byref(spherical_ext_state_size_c))
+spherical_ext_state_size = spherical_ext_state_size_c.value
 
 print('spherical ext state size:')
 print(spherical_ext_state_size)
 
 get_spherical_boundary_size = ldope.get_spherical_boundary_size
-get_spherical_boundary_size.restype = ctypes.c_size_t
-spherical_boundary_size = get_spherical_boundary_size()
+spherical_boundary_size_c = ctypes.c_size_t()
+get_spherical_boundary_size(ctypes.byref(spherical_boundary_size_c))
+spherical_boundary_size = spherical_boundary_size_c.value
 
 print('spherical boundary size:')
 print(spherical_boundary_size)
 
 get_spherical_individual_size = ldope.get_spherical_individual_size
-get_spherical_individual_size.restype = ctypes.c_size_t
-spherical_individual_size = get_spherical_individual_size()
+spherical_individual_size_c = ctypes.c_size_t()
+get_spherical_individual_size(ctypes.byref(spherical_individual_size_c))
+spherical_individual_size = spherical_individual_size_c.value
 
 print('spherical individual size:')
 print(spherical_individual_size)
@@ -79,7 +84,7 @@ print(costate_e)
 print('tf:')
 print(tf)
 
-#%%
+#%% 测试球坐标系归一化和反归一化
 util_spherical_norm = ldope.spherical_state_norm_fcn
 print(util_spherical_norm)
 

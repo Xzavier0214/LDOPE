@@ -15,41 +15,46 @@ print(ldope)
 
 #%% 测试导出常量
 get_cartesian_state_size = ldope.get_cartesian_state_size
-get_cartesian_state_size.restype = ctypes.c_size_t
-cartesian_state_size = get_cartesian_state_size()
+cartesian_state_size_c = ctypes.c_size_t()
+get_cartesian_state_size(ctypes.byref(cartesian_state_size_c))
+cartesian_state_size = cartesian_state_size_c.value
 
 print('cartesian state size:')
 print(cartesian_state_size)
 
 get_cartesian_control_size = ldope.get_cartesian_control_size
-get_cartesian_control_size.restype = ctypes.c_size_t
-cartesian_control_size = get_cartesian_control_size()
+cartesian_control_size_c = ctypes.c_size_t()
+get_cartesian_control_size(ctypes.byref(cartesian_control_size_c))
+cartesian_control_size = cartesian_control_size_c.value
 
 print('cartesian control size:')
 print(cartesian_control_size)
 
 get_cartesian_ext_state_size = ldope.get_cartesian_ext_state_size
-get_cartesian_ext_state_size.restype = ctypes.c_size_t
-cartesian_ext_state_size = get_cartesian_ext_state_size()
+cartesian_ext_state_size_c = ctypes.c_size_t()
+get_cartesian_ext_state_size(ctypes.byref(cartesian_ext_state_size_c))
+cartesian_ext_state_size = cartesian_ext_state_size_c.value
 
 print('cartesian ext state size:')
 print(cartesian_ext_state_size)
 
 get_cartesian_boundary_size = ldope.get_cartesian_boundary_size
-get_cartesian_boundary_size.restype = ctypes.c_size_t
-cartesian_boundary_size = get_cartesian_boundary_size()
+cartesian_boundary_size_c = ctypes.c_size_t()
+get_cartesian_boundary_size(ctypes.byref(cartesian_boundary_size_c))
+cartesian_boundary_size = cartesian_boundary_size_c.value
 
 print('cartesian boundary size:')
 print(cartesian_boundary_size)
 
 get_cartesian_individual_size = ldope.get_cartesian_individual_size
-get_cartesian_individual_size.restype = ctypes.c_size_t
-cartesian_individual_size = get_cartesian_individual_size()
+cartesian_individual_size_c = ctypes.c_size_t()
+get_cartesian_individual_size(ctypes.byref(cartesian_individual_size_c))
+cartesian_individual_size = cartesian_individual_size_c.value
 
 print('cartesian individual size:')
 print(cartesian_individual_size)
 
-#%% 测试球坐标系个体转换
+#%% 测试笛卡尔坐标系个体转换
 util_cartesian_converter = ldope.cartesian_individual_convert_fcn
 print(util_cartesian_converter)
 
@@ -80,7 +85,7 @@ print(costate_e)
 print('tf:')
 print(tf)
 
-#%%
+#%% 测试笛卡尔坐标系归一化和反归一化
 util_cartesian_norm = ldope.cartesian_state_norm_fcn
 print(util_cartesian_norm)
 

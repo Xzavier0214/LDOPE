@@ -49,11 +49,11 @@ void CartesianStateDenormFcn(const double *pState, double du, double tu, double 
 extern "C"
 {
     //  球坐标系常量
-    size_t get_spherical_state_size();
-    size_t get_spherical_control_size();
-    size_t get_spherical_ext_state_size();
-    size_t get_spherical_boundary_size();
-    size_t get_spherical_individual_size();
+    void get_spherical_state_size(size_t &stateSize);
+    void get_spherical_control_size(size_t &controlSize);
+    void get_spherical_ext_state_size(size_t &extStateSize);
+    void get_spherical_boundary_size(size_t &boundarySize);
+    void get_spherical_individual_size(size_t &individualSize);
 
     //  球坐标系个体转换
     void spherical_individual_convert_fcn(const double *pIndividual, double *pCostateP,
@@ -68,11 +68,11 @@ extern "C"
                                     double *pDenormedState);
 
     //  笛卡尔坐标常量
-    size_t get_cartesian_state_size();
-    size_t get_cartesian_control_size();
-    size_t get_cartesian_ext_state_size();
-    size_t get_cartesian_boundary_size();
-    size_t get_cartesian_individual_size();
+    void get_cartesian_state_size(size_t &stateSize);
+    void get_cartesian_control_size(size_t &controlSize);
+    void get_cartesian_ext_state_size(size_t &extStateSize);
+    void get_cartesian_boundary_size(size_t &boundarySize);
+    void get_cartesian_individual_size(size_t &individualSize);
 
     //  笛卡尔坐标个体转换
     void cartesian_individual_convert_fcn(const double *pIndividual, double *pCostateP,

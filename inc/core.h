@@ -3,7 +3,8 @@
 
 #include <string.h>
 
-struct Param {
+struct Param
+{
     double *pInitialStateP; // 追踪者初始状态（非归一化）
     double *pInitialStateE; // 逃逸者初始状态（非归一化）
     double tmP;             // 追踪者推重比（非归一化）
@@ -13,8 +14,6 @@ struct Param {
     double *pK;             // 权重系数
     double du;              // 距离归一化系数（非归一化）
     double tu;              // 时间归一化系数（非归一化）
-
-    unsigned int dim;       // 个体维数（Spherical：11，Cartesian：13）
     bool printProcess;      // 打印计算过程
 };
 
@@ -32,8 +31,8 @@ void SphericalCostateFcn(const double *pState, const double *pCostate, const dou
 void SphericalControlFcn(const double *pState, const double *pCostate, int flag, double *pControl);
 
 //  球坐标系哈密顿函数
-double SphericalHamiltonFcn(const double *pState, const double *pCostate, const double *pControl,
-                            double tm, double mu);
+void SphericalHamiltonFcn(const double *pState, const double *pCostate, const double *pControl,
+                          double tm, double mu, double &hamilton);
 
 //  球坐标系扩展状态微分方程
 void SphericalExtStateFcn(const double *pExtState, double tmP, double tmE, double mu, double *pDotExtState);
@@ -42,11 +41,11 @@ void SphericalExtStateFcn(const double *pExtState, double tmP, double tmE, doubl
 void SphericalBoundaryFcn(const double *pExtState, double tmP, double tmE, double mu, double *pBoundary);
 
 //  球坐标系适应度函数
-double SphericalFitnessFcn(const double *pIndividual, const double *pK, const double *pStateP0, const double *pStateE0,
-                           double tmP, double tmE, double du, double tu);
+void SphericalFitnessFcn(const double *pIndividual, const double *pK, const double *pStateP0, const double *pStateE0,
+                         double tmP, double tmE, double du, double tu, double &fitness);
 
 //  求解球坐标系
-double SphericalSolveFcn(Param *pParam, double *pOptIndividual, bool printProcess = false);
+void SphericalSolveFcn(Param *pParam, double *pOptIndividual, double &optValue);
 
 //////////////////////////笛卡尔坐标系//////////////////////////
 
@@ -76,6 +75,66 @@ double CartesianFitnessFcn(const double *pIndividual, const double *pK, const do
                            double tmP, double tmE, double du, double tu);
 
 //  求解笛卡尔坐标系
-double CartesianSolveFcn(Param *pParam, double *pOptIndividual, bool printProcess = false);
+void CartesianSolveFcn(Param *pParam, double *pOptIndividual, double &optValue);
+
+//  导出
+extern "C"
+{
+    //  球坐标系状态微分方程
+    void spherical_state_fcn(const double *pState, const double *pControl,
+                             double tm, double mu, double *pDotState);
+
+    //  球坐标系协态微分方程
+    void spherical_costate_fcn(const double *pState, const double *pCostate, const double *pControl,
+                               double tm, double mu, double *pDotCostate);
+
+    //  球坐标系控制变量函数
+    void spherical_control_fcn(const double *pState, const double *pCostate, int flag, double *pControl);
+
+    //  球坐标系哈密顿函数
+    void spherical_hamilton_fcn(const double *pState, const double *pCostate, const double *pControl,
+                                double tm, double mu, double &hamilton);
+
+    //  球坐标系扩展状态微分方程
+    void spherical_ext_state_fcn(const double *pExtState, double tmP, double tmE, double mu, double *pDotExtState);
+
+    //  球坐标系边界条件
+    void spherical_boundary_fcn(const double *pExtState, double tmP, double tmE, double mu, double *pBoundary);
+
+    //  球坐标系适应度函数
+    void spherical_fitness_fcn(const double *pIndividual, const double *pK, const double *pStateP0, const double *pStateE0,
+                               double tmP, double tmE, double du, double tu, double &fitness);
+
+    //  求解球坐标系
+    void spherical_solve_fcn(Param *pParam, double *pOptIndividual, double &optValue);
+
+    //  笛卡尔坐标系状态微分方程
+    void cartesian_state_fcn(const double *pState, const double *pControl,
+                             double tm, double mu, double *pDotState);
+
+    //  笛卡尔坐标系协态微分方程
+    void cartesian_costate_fcn(const double *pState, const double *pCostate, const double *pControl,
+                               double tm, double mu, double *pDotCostate);
+
+    //  笛卡尔坐标系控制变量函数
+    void cartesian_control_fcn(const double *pState, const double *pCostate, int flag, double *pControl);
+
+    //  笛卡尔坐标系哈密顿函数
+    double cartesian_hamilton_fcn(const double *pState, const double *pCostate, const double *pControl,
+                                  double tm, double mu);
+
+    //  笛卡尔坐标系扩展状态微分方程
+    void cartesian_ext_state_fcn(const double *pExtState, double tmP, double tmE, double mu, double *pDotExtState);
+
+    //  笛卡尔坐标系边界条件
+    void cartesian_boundary_fcn(const double *pExtState, double tmP, double tmE, double mu, double *pBoundary);
+
+    //  笛卡尔坐标系适应度函数
+    double cartesian_fitness_fcn(const double *pIndividual, const double *pK, const double *pStateP0, const double *pStateE0,
+                                 double tmP, double tmE, double du, double tu);
+
+    //  求解笛卡尔坐标系
+    double cartesian_solve_fcn(Param *pParam, double *pOptIndividual, bool printProcess = false);
+}
 
 #endif //LDOPE_CORE_H

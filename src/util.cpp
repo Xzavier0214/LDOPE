@@ -65,11 +65,11 @@ void CartesianStateDenormFcn(const double *pState, double du, double tu, double 
 extern "C"
 {
     //  球坐标系常量
-    size_t get_spherical_state_size() { return SPHERICAL_STATE_SIZE; }
-    size_t get_spherical_control_size() { return SPHERICAL_CONTROL_SIZE; }
-    size_t get_spherical_ext_state_size() { return SPHERICAL_EXT_STATE_SIZE; }
-    size_t get_spherical_boundary_size() { return SPHERICAL_BOUNDARY_SIZE; }
-    size_t get_spherical_individual_size() { return SPHERICAL_INDIVIDUAL_SIZE; }
+    void get_spherical_state_size(size_t &stateSize) { stateSize = SPHERICAL_STATE_SIZE; }
+    void get_spherical_control_size(size_t &controlSize) { controlSize = SPHERICAL_CONTROL_SIZE; }
+    void get_spherical_ext_state_size(size_t &extStateSize) { extStateSize = SPHERICAL_EXT_STATE_SIZE; }
+    void get_spherical_boundary_size(size_t &boundarySize) { boundarySize = SPHERICAL_BOUNDARY_SIZE; }
+    void get_spherical_individual_size(size_t &individualSize) { individualSize = SPHERICAL_INDIVIDUAL_SIZE; }
 
     //  球坐标系个体转换
     void spherical_individual_convert_fcn(const double *pIndividual, double *pCostateP,
@@ -93,11 +93,11 @@ extern "C"
     }
 
     //  笛卡尔坐标系常量
-    size_t get_cartesian_state_size() { return CARTESIAN_STATE_SIZE; }
-    size_t get_cartesian_control_size() { return CARTESIAN_CONTROL_SIZE; }
-    size_t get_cartesian_ext_state_size() { return CARTESIAN_EXT_STATE_SIZE; }
-    size_t get_cartesian_boundary_size() { return CARTESIAN_BOUNDARY_SIZE; }
-    size_t get_cartesian_individual_size() { return CARTESIAN_INDIVIDUAL_SIZE; }
+    void get_cartesian_state_size(size_t &stateSize) { stateSize = CARTESIAN_STATE_SIZE; }
+    void get_cartesian_control_size(size_t &controlSize) { controlSize = CARTESIAN_CONTROL_SIZE; }
+    void get_cartesian_ext_state_size(size_t &extStateSize) { extStateSize = CARTESIAN_EXT_STATE_SIZE; }
+    void get_cartesian_boundary_size(size_t &boundarySize) { boundarySize = CARTESIAN_BOUNDARY_SIZE; }
+    void get_cartesian_individual_size(size_t &individualSize) { individualSize = CARTESIAN_INDIVIDUAL_SIZE; }
 
     //  笛卡尔坐标系个体转换
     void cartesian_individual_convert_fcn(const double *pIndividual, double *pCostateP,
