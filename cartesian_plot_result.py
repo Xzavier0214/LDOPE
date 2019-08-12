@@ -6,32 +6,32 @@ from numpy import sin, cos, sqrt
 import seaborn
 from scipy.integrate import solve_ivp
 import ldope
-import spherical_solve
+import cartesian_solve
 
 #%% 初始化
 case_index = 3
 index = 1
 
-state_p0 = spherical_solve.cases[case_index - 1][0]
-state_e0 = spherical_solve.cases[case_index - 1][1]
-state_p0_norm = ldope.spherical_state_norm_fcn(state_p0)
-state_e0_norm = ldope.spherical_state_norm_fcn(state_e0)
+state_p0 = cartesian_solve.cases[case_index - 1][0]
+state_e0 = cartesian_solve.cases[case_index - 1][1]
+state_p0_norm = ldope.cartesian_state_norm_fcn(state_p0)
+state_e0_norm = ldope.cartesian_state_norm_fcn(state_e0)
 
 read_line = 1
-with open('./data/spherical/{}.data'.format(case_index), 'r') as data:
+with open('./data/cartesian/{}.data'.format(case_index), 'r') as data:
     for each_line in data:
         if read_line < index:
             index += 1
             continue
         temp = each_line.split(' ')
         individual = [
-            float(ele) for ele in temp[0:ldope.SPHERICAL_INDIVIDUAL_SIZE]
+            float(ele) for ele in temp[0:ldope.CARTESIAN_INDIVIDUAL_SIZE]
         ]
-        opt_value = float(temp[ldope.SPHERICAL_INDIVIDUAL_SIZE])
-        time_cost = float(temp[ldope.SPHERICAL_INDIVIDUAL_SIZE + 1])
+        opt_value = float(temp[ldope.CARTESIAN_INDIVIDUAL_SIZE])
+        time_cost = float(temp[ldope.CARTESIAN_INDIVIDUAL_SIZE + 1])
         break
 
-costate_p0, costate_e0, tf_norm = ldope.spherical_individual_convert_fcn(
+costate_p0, costate_e0, tf_norm = ldope.cartesian_individual_convert_fcn(
     individual)
 
 #%% 计算归一化结果
@@ -41,7 +41,7 @@ t_eval = np.arange(0, tf_norm, step)
 t_eval = np.append(t_eval, tf_norm)
 
 result = solve_ivp(
-    lambda t, y: ldope.spherical_ext_state_fcn(tuple(y.tolist()), True),
+    lambda t, y: ldope.cartesian_ext_state_fcn(tuple(y.tolist()), True),
     t_span=np.array(t_span),
     y0=np.array(state_p0_norm + state_e0_norm + costate_p0 + costate_e0),
     t_eval=t_eval)
@@ -52,15 +52,12 @@ r = []
 
 for i in range(len(result.t)):
     split_state = result.y.T[i]
-    r_p, r_e = float(split_state[0]), float(split_state[6])
-    xi_p, xi_e = float(split_state[3]), float(split_state[9])
-    phi_p, phi_e = float(split_state[4]), float(split_state[10])
-    xp.append(r_p * cos(phi_p) * cos(xi_p))
-    yp.append(r_p * cos(phi_p) * sin(xi_p))
-    zp.append(r_p * sin(phi_p))
-    xe.append(r_e * cos(phi_e) * cos(xi_e))
-    ye.append(r_e * cos(phi_e) * sin(xi_e))
-    ze.append(r_e * sin(phi_e))
+    xp.append(float(split_state[0]))
+    yp.append(float(split_state[1]))
+    zp.append(float(split_state[2]))
+    xe.append(float(split_state[6]))
+    ye.append(float(split_state[7]))
+    ze.append(float(split_state[8]))
     r.append(
         sqrt((xp[-1] - xe[-1])**2 + (yp[-1] - ye[-1])**2 +
              (zp[-1] - ze[-1])**2))
@@ -108,7 +105,7 @@ t_eval = np.arange(0, tf_norm * ldope.TU, step)
 t_eval = np.append(t_eval, tf_norm * ldope.TU)
 
 result = solve_ivp(
-    lambda t, y: ldope.spherical_ext_state_fcn(tuple(y.tolist()), False),
+    lambda t, y: ldope.cartesian_ext_state_fcn(tuple(y.tolist()), False),
     t_span=np.array(t_span),
     y0=np.array(state_p0 + state_e0 + costate_p0 + costate_e0),
     t_eval=t_eval)
@@ -119,15 +116,12 @@ r = []
 
 for i in range(len(result.t)):
     split_state = result.y.T[i]
-    r_p, r_e = float(split_state[0]), float(split_state[6])
-    xi_p, xi_e = float(split_state[3]), float(split_state[9])
-    phi_p, phi_e = float(split_state[4]), float(split_state[10])
-    xp.append(r_p * cos(phi_p) * cos(xi_p))
-    yp.append(r_p * cos(phi_p) * sin(xi_p))
-    zp.append(r_p * sin(phi_p))
-    xe.append(r_e * cos(phi_e) * cos(xi_e))
-    ye.append(r_e * cos(phi_e) * sin(xi_e))
-    ze.append(r_e * sin(phi_e))
+    xp.append(float(split_state[0]))
+    yp.append(float(split_state[1]))
+    zp.append(float(split_state[2]))
+    xe.append(float(split_state[6]))
+    ye.append(float(split_state[7]))
+    ze.append(float(split_state[8]))
     r.append(
         sqrt((xp[-1] - xe[-1])**2 + (yp[-1] - ye[-1])**2 +
              (zp[-1] - ze[-1])**2))
