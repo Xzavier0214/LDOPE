@@ -12,5 +12,7 @@ include_directories(${PROJECT_SOURCE_DIR}/inc)
 aux_source_directory(${PROJECT_SOURCE_DIR}/src LDOPE_SCRS)
 
 add_library(ldope SHARED ${LDOPE_SCRS})
+add_executable(test test.cpp ${LDOPE_SCRS})
 
 target_link_libraries(ldope ${GSL_LIBRARIES} ${NLOPT_LIBRARIES})
+target_link_libraries(test ${GSL_LIBRARIES} ${NLOPT_LIBRARIES})

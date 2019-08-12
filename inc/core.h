@@ -61,8 +61,8 @@ void CartesianCostateFcn(const double *pState, const double *pCostate, const dou
 void CartesianControlFcn(const double *pState, const double *pCostate, int flag, double *pControl);
 
 //  笛卡尔坐标系哈密顿函数
-double CartesianHamiltonFcn(const double *pState, const double *pCostate, const double *pControl,
-                            double tm, double mu);
+void CartesianHamiltonFcn(const double *pState, const double *pCostate, const double *pControl,
+                          double tm, double mu, double &hamilton);
 
 //  笛卡尔坐标系扩展状态微分方程
 void CartesianExtStateFcn(const double *pExtState, double tmP, double tmE, double mu, double *pDotExtState);
@@ -71,8 +71,8 @@ void CartesianExtStateFcn(const double *pExtState, double tmP, double tmE, doubl
 void CartesianBoundaryFcn(const double *pExtState, double tmP, double tmE, double mu, double *pBoundary);
 
 //  笛卡尔坐标系适应度函数
-double CartesianFitnessFcn(const double *pIndividual, const double *pK, const double *pStateP0, const double *pStateE0,
-                           double tmP, double tmE, double du, double tu);
+void CartesianFitnessFcn(const double *pIndividual, const double *pK, const double *pStateP0, const double *pStateE0,
+                         double tmP, double tmE, double du, double tu, double &fitness);
 
 //  求解笛卡尔坐标系
 void CartesianSolveFcn(Param *pParam, double *pOptIndividual, double &optValue);
@@ -120,8 +120,8 @@ extern "C"
     void cartesian_control_fcn(const double *pState, const double *pCostate, int flag, double *pControl);
 
     //  笛卡尔坐标系哈密顿函数
-    double cartesian_hamilton_fcn(const double *pState, const double *pCostate, const double *pControl,
-                                  double tm, double mu);
+    void cartesian_hamilton_fcn(const double *pState, const double *pCostate, const double *pControl,
+                                double tm, double mu, double &hamilton);
 
     //  笛卡尔坐标系扩展状态微分方程
     void cartesian_ext_state_fcn(const double *pExtState, double tmP, double tmE, double mu, double *pDotExtState);
@@ -130,11 +130,11 @@ extern "C"
     void cartesian_boundary_fcn(const double *pExtState, double tmP, double tmE, double mu, double *pBoundary);
 
     //  笛卡尔坐标系适应度函数
-    double cartesian_fitness_fcn(const double *pIndividual, const double *pK, const double *pStateP0, const double *pStateE0,
-                                 double tmP, double tmE, double du, double tu);
+    void cartesian_fitness_fcn(const double *pIndividual, const double *pK, const double *pStateP0, const double *pStateE0,
+                               double tmP, double tmE, double du, double tu, double &fitness);
 
     //  求解笛卡尔坐标系
-    double cartesian_solve_fcn(Param *pParam, double *pOptIndividual, bool printProcess = false);
+    void cartesian_solve_fcn(Param *pParam, double *pOptIndividual, double &optValue);
 }
 
 #endif //LDOPE_CORE_H

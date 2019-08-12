@@ -8,7 +8,7 @@ from numpy import deg2rad, sqrt
 platform = sys.platform
 print(platform)
 
-if (platform == 'darwin'):
+if platform == 'darwin':
     ldope = ctypes.CDLL('./lib/libldope.dylib')
 
 print(ldope)

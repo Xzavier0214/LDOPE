@@ -483,8 +483,8 @@ void CartesianControlFcn(const double *pState, const double *pCostate, int flag,
     }
 }
 
-double CartesianHamiltonFcn(const double *pState, const double *pCostate, const double *pControl,
-                            double tm, double mu)
+void CartesianHamiltonFcn(const double *pState, const double *pCostate, const double *pControl,
+                          double tm, double mu, double &hamilton)
 {
     double gDotState[6];
     CartesianStateFcn(pState, pControl, tm, mu, gDotState);
@@ -492,7 +492,7 @@ double CartesianHamiltonFcn(const double *pState, const double *pCostate, const 
     double result = .0;
     for (int i = 0; i < 6; i++)
         result += pCostate[i] * gDotState[i];
-    return result;
+    hamilton = result;
 }
 
 void CartesianExtStateFcn(const double *pExtState, double tmP, double tmE, double mu, double *pDotExtState)
@@ -530,12 +530,16 @@ void CartesianBoundaryFcn(const double *pExtState, double tmP, double tmE, doubl
     double gControlP[2], gControlE[2];
     CartesianControlFcn(pStateP, pCostateP, -1, gControlP);
     CartesianControlFcn(pStateE, pCostateE, 1, gControlE);
-    pBoundary[12] = 1 + CartesianHamiltonFcn(pStateP, pCostateP, gControlP, tmP, mu) +
-                    CartesianHamiltonFcn(pStateE, pCostateE, gControlE, tmE, mu);
+
+    double hamiltonP, hamiltonE;
+    CartesianHamiltonFcn(pStateP, pCostateP, gControlP, tmP, mu, hamiltonP);
+    CartesianHamiltonFcn(pStateE, pCostateE, gControlE, tmE, mu, hamiltonE);
+
+    pBoundary[12] = 1 + hamiltonP + hamiltonE;
 }
 
-double CartesianFitnessFcn(const double *pIndividual, const double *pK, const double *pStateP0, const double *pStateE0,
-                           double tmP, double tmE, double du, double tu)
+void CartesianFitnessFcn(const double *pIndividual, const double *pK, const double *pStateP0, const double *pStateE0,
+                         double tmP, double tmE, double du, double tu, double &fitness)
 {
     static auto norm_fcn = [](const double *pExtState, double du, double tu, double *pNormExtState) {
         for (int i = 0; i < 3; i++)
@@ -605,11 +609,11 @@ double CartesianFitnessFcn(const double *pIndividual, const double *pK, const do
         double target = .0;
         for (int i = 0; i < 13; i++)
             target += pK[i] * abs(gBoundary[i]);
-        return target;
+        fitness = target;
     }
 }
 
-double CartesianSolveFcn(Param *pParam, double *pOptIndividual)
+void CartesianSolveFcn(Param *pParam, double *pOptIndividual, double &optValue)
 {
     const unsigned int dim = CARTESIAN_INDIVIDUAL_SIZE;
 
@@ -639,8 +643,9 @@ double CartesianSolveFcn(Param *pParam, double *pOptIndividual)
 
     auto objective = [](const std::vector<double> &x, std::vector<double> &grad, void *f_data) {
         auto p = (Param *)f_data;
-        auto result = CartesianFitnessFcn(x.data(), p->pK, p->pInitialStateP, p->pInitialStateE,
-                                          p->tmP, p->tmE, p->du, p->tu);
+        double result;
+        CartesianFitnessFcn(x.data(), p->pK, p->pInitialStateP, p->pInitialStateE,
+                            p->tmP, p->tmE, p->du, p->tu, result);
         const unsigned int dim = CARTESIAN_INDIVIDUAL_SIZE;
 
         // if (!grad.empty()) {
@@ -690,10 +695,16 @@ double CartesianSolveFcn(Param *pParam, double *pOptIndividual)
     // pOptLocalD->set_xtol_rel(1e-9);
     // pOptLocalD->set_xtol_abs(1e-9);
 
+    if (pParam->printProcess)
+        cout << "Global Optimization:" << endl;
+
     pOptGlobal->optimize(optXGlobal, optFGlobal);
 
     optXLocalN = optXGlobal;
     optFLocalN = optFGlobal;
+
+    if (pParam->printProcess)
+        cout << "Local Optimization:" << endl;
 
     pOptLocalN->optimize(optXLocalN, optFLocalN);
 
@@ -703,7 +714,7 @@ double CartesianSolveFcn(Param *pParam, double *pOptIndividual)
     // pOptLocalD->optimize(optXLocalD, optFLocalD);
 
     memcpy(pOptIndividual, optXLocalN.data(), dim * sizeof(double));
-    return optFLocalN;
+    optValue = optFLocalN;
 }
 
 //////////////////////////导出//////////////////////////
@@ -762,31 +773,55 @@ extern "C"
         SphericalSolveFcn(pParam, pOptIndividual, optValue);
     }
 
-    // //  笛卡尔坐标系状态微分方程
-    // void cartesian_state_fcn(const double *pState, const double *pControl,
-    //                          double tm, double mu, double *pDotState);
+    //  笛卡尔坐标系状态微分方程
+    void cartesian_state_fcn(const double *pState, const double *pControl,
+                             double tm, double mu, double *pDotState)
+    {
+        CartesianStateFcn(pState, pControl, tm, mu, pDotState);
+    }
 
-    // //  笛卡尔坐标系协态微分方程
-    // void cartesian_costate_fcn(const double *pState, const double *pCostate, const double *pControl,
-    //                            double tm, double mu, double *pDotCostate);
+    //  笛卡尔坐标系协态微分方程
+    void cartesian_costate_fcn(const double *pState, const double *pCostate, const double *pControl,
+                               double tm, double mu, double *pDotCostate)
+    {
+        CartesianCostateFcn(pState, pCostate, pControl, tm, mu, pDotCostate);
+    }
 
-    // //  笛卡尔坐标系控制变量函数
-    // void cartesian_control_fcn(const double *pState, const double *pCostate, int flag, double *pControl);
+    //  笛卡尔坐标系控制变量函数
+    void cartesian_control_fcn(const double *pState, const double *pCostate, int flag, double *pControl)
+    {
+        CartesianControlFcn(pState, pCostate, flag, pControl);
+    }
 
-    // //  笛卡尔坐标系哈密顿函数
-    // double cartesian_hamilton_fcn(const double *pState, const double *pCostate, const double *pControl,
-    //                               double tm, double mu);
+    //  笛卡尔坐标系哈密顿函数
+    void cartesian_hamilton_fcn(const double *pState, const double *pCostate, const double *pControl,
+                                double tm, double mu, double &hamilton)
+    {
+        CartesianHamiltonFcn(pState, pCostate, pControl, tm, mu, hamilton);
+    }
 
-    // //  笛卡尔坐标系扩展状态微分方程
-    // void cartesian_ext_state_fcn(const double *pExtState, double tmP, double tmE, double mu, double *pDotExtState);
+    //  笛卡尔坐标系扩展状态微分方程
+    void cartesian_ext_state_fcn(const double *pExtState, double tmP, double tmE, double mu, double *pDotExtState)
+    {
+        CartesianExtStateFcn(pExtState, tmP, tmE, mu, pDotExtState);
+    }
 
-    // //  笛卡尔坐标系边界条件
-    // void cartesian_boundary_fcn(const double *pExtState, double tmP, double tmE, double mu, double *pBoundary);
+    //  笛卡尔坐标系边界条件
+    void cartesian_boundary_fcn(const double *pExtState, double tmP, double tmE, double mu, double *pBoundary)
+    {
+        CartesianBoundaryFcn(pExtState, tmP, tmE, mu, pBoundary);
+    }
 
-    // //  笛卡尔坐标系适应度函数
-    // double cartesian_fitness_fcn(const double *pIndividual, const double *pK, const double *pStateP0, const double *pStateE0,
-    //                              double tmP, double tmE, double du, double tu);
+    //  笛卡尔坐标系适应度函数
+    void cartesian_fitness_fcn(const double *pIndividual, const double *pK, const double *pStateP0, const double *pStateE0,
+                               double tmP, double tmE, double du, double tu, double &fitness)
+    {
+        CartesianFitnessFcn(pIndividual, pK, pStateP0, pStateE0, tmP, tmE, du, tu, fitness);
+    }
 
-    // //  求解笛卡尔坐标系
-    // double cartesian_solve_fcn(Param *pParam, double *pOptIndividual, bool printProcess = false);
+    //  求解笛卡尔坐标系
+    void cartesian_solve_fcn(Param *pParam, double *pOptIndividual, double &optValue)
+    {
+        CartesianSolveFcn(pParam, pOptIndividual, optValue);
+    }
 }
