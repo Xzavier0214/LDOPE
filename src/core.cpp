@@ -222,7 +222,7 @@ void SphericalFitnessFcn(const double *pIndividual, const double *pK, const doub
     if (status != GSL_SUCCESS)
     {
         printf("error, return value=%d\n", status);
-        exit(1);
+        throw status;
     }
     else
     {
@@ -591,7 +591,7 @@ void CartesianFitnessFcn(const double *pIndividual, const double *pK, const doub
     if (status != GSL_SUCCESS)
     {
         printf("error, return value=%d\n", status);
-        exit(1);
+        throw status;
     }
     else
     {
@@ -658,6 +658,7 @@ void CartesianSolveFcn(Param *pParam, double *pOptIndividual, double &optValue)
     pOptLocalN->set_ftol_abs(1e-6);
     pOptLocalN->set_xtol_rel(1e-6);
     pOptLocalN->set_xtol_abs(1e-6);
+    pOptLocalN->set_maxeval(1e4);
 
     if (pParam->printProcess)
         cout << "Global Optimization:" << endl;

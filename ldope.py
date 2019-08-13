@@ -167,11 +167,11 @@ def cartesian_state_norm_fcn(state):
 
 
 #%% 核心函数的定义
-def spherical_ext_state_fcn(ext_state, normalized=False):
+def spherical_ext_state_fcn(ext_state, norm=False):
     ext_state_c = spherical_ext_state_type(*ext_state)
     dot_ext_state_c = spherical_ext_state_type()
 
-    if normalized:
+    if norm:
         ldope.spherical_ext_state_fcn(ext_state_c, tm_p_c_norm, tm_e_c_norm,
                                       ctypes.c_double(1), dot_ext_state_c)
     else:
@@ -180,11 +180,11 @@ def spherical_ext_state_fcn(ext_state, normalized=False):
     return tuple(dot_ext_state_c)
 
 
-def cartesian_ext_state_fcn(ext_state, normalized=False):
+def cartesian_ext_state_fcn(ext_state, norm=False):
     ext_state_c = cartesian_ext_state_type(*ext_state)
     dot_ext_state_c = cartesian_ext_state_type()
 
-    if normalized:
+    if norm:
         ldope.cartesian_ext_state_fcn(ext_state_c, tm_p_c_norm, tm_e_c_norm,
                                       ctypes.c_double(1), dot_ext_state_c)
     else:

@@ -19,33 +19,36 @@ CASE_3 = ((6700e3, 7.713e3, deg2rad(0), deg2rad(170), deg2rad(0), deg2rad(70)),
 CASES = (CASE_1, CASE_2, CASE_3)
 
 
-def spherical_solve(case_index, lb, ub):
+def solve_spherical_model(case_index, lb, ub):
     state_p0 = CASES[case_index - 1][0]
     state_e0 = CASES[case_index - 1][1]
 
-    opt_individual, opt_value, time_cost = ldope.spherical_solve_fcn(
-        state_p0, state_e0, lb, ub)
+    try:
+        opt_individual, opt_value, time_cost = ldope.spherical_solve_fcn(
+            state_p0, state_e0, lb, ub)
+    except:
+        print('exception!')
+    else:
+        print(opt_individual)
+        print(opt_value)
+        print(time_cost)
 
-    print(opt_individual)
-    print(opt_value)
-    print(time_cost)
+        costate_p0, costate_e0, tf_norm = \
+            ldope.spherical_individual_convert_fcn(opt_individual)
 
-    costate_p0, costate_e0, tf_norm = ldope.spherical_individual_convert_fcn(
-        opt_individual)
+        step = 0.05
+        t_span = 0, tf_norm
+        t_eval = np.arange(0, tf_norm, step)
+        t_eval = np.append(t_eval, tf_norm)
 
-    step = 0.05
-    t_span = 0, tf_norm
-    t_eval = np.arange(0, tf_norm, step)
-    t_eval = np.append(t_eval, tf_norm)
+        file_name = './data/spherical/{}.data'.format(case_index)
 
-    file_name = './data/spherical/{}.data'.format(case_index)
-
-    with open(file_name, 'a') as data:
-        data.write('{} '.format(opt_value))
-        data.write('{} '.format(time_cost))
-        for ele in opt_individual:
-            data.write('{} '.format(ele))
-        data.write('\n')
+        with open(file_name, 'a') as data:
+            data.write('{} '.format(opt_value))
+            data.write('{} '.format(time_cost))
+            for ele in opt_individual:
+                data.write('{} '.format(ele))
+            data.write('\n')
 
 
 #%% 求解
@@ -56,4 +59,4 @@ if __name__ == "__main__":
     lb = -10, -10, -10, -10, -10, -10, -10, -10, -10, -10, 1
     ub = 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 5
 
-    spherical_solve(case_index, lb, ub)
+    solve_spherical_model(case_index, lb, ub)
