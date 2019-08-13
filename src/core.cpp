@@ -244,7 +244,6 @@ void SphericalSolveFcn(Param *pParam, double *pOptIndividual, double &optValue)
 
     auto *pOptGlobal = new nlopt::opt(nlopt::algorithm::GN_ISRES, dim);
     auto *pOptLocalN = new nlopt::opt(nlopt::algorithm::LN_NELDERMEAD, dim);
-    //    auto *pOptLocalD = new nlopt::opt(nlopt::algorithm::LD_MMA, dim);
 
     auto optXGlobal = std::vector<double>(dim, 0);
     double optFGlobal = .0;
@@ -252,15 +251,11 @@ void SphericalSolveFcn(Param *pParam, double *pOptIndividual, double &optValue)
     auto optXLocalN = std::vector<double>(dim, 0);
     double optFLocalN = .0;
 
-    //    auto optXLocalD = std::vector<double>(dim, 0);
-    //    double optFLocalD = .0;
-
     for (int i = 0; i < dim; i++)
     {
         double temp = (pParam->lb[i] + pParam->ub[i]) / 2.0;
         optXGlobal[i] = temp;
         optXLocalN[i] = temp;
-        // optXLocalD[i] = temp;
     }
 
     auto lb = std::vector<double>(pParam->lb, pParam->lb + dim);
@@ -272,23 +267,6 @@ void SphericalSolveFcn(Param *pParam, double *pOptIndividual, double &optValue)
         SphericalFitnessFcn(x.data(), p->pK, p->pInitialStateP, p->pInitialStateE,
                             p->tmP, p->tmE, p->du, p->tu, result);
         const unsigned int dim = SPHERICAL_INDIVIDUAL_SIZE;
-
-        //        if (!grad.empty()) {
-        //            double delta = 1e-8;
-        //            double tempX[dim];
-        //            double f1, f2;
-        //            memcpy(tempX, x.data(), dim*sizeof(double));
-        //            for (int i = 0; i < dim; i++) {
-        //                tempX[i] += delta/2;
-        //                f1 = SphericalFitnessFcn(tempX, p->pK, p->pInitialStateP, p->pInitialStateE,
-        //                                         p->tmP, p->tmE, p->du, p->tu);
-        //                tempX[i] -= delta;
-        //                f2 = SphericalFitnessFcn(tempX, p->pK, p->pInitialStateP, p->pInitialStateE,
-        //                                         p->tmP, p->tmE, p->du, p->tu);
-        //                tempX[i] += delta/2;
-        //                grad[i] = (f1 - f2)/delta;
-        //            }
-        //        }
 
         if (p->printProcess)
             cout << x.data()[dim - 1] << '\t' << result << endl;
@@ -312,14 +290,6 @@ void SphericalSolveFcn(Param *pParam, double *pOptIndividual, double &optValue)
     pOptLocalN->set_xtol_rel(1e-6);
     pOptLocalN->set_xtol_abs(1e-6);
 
-    //    pOptLocalD->set_min_objective(objective, pParam);
-    //    pOptLocalD->set_lower_bounds(lb);
-    //    pOptLocalD->set_upper_bounds(ub);
-    //    pOptLocalD->set_ftol_rel(1e-9);
-    //    pOptLocalD->set_ftol_abs(1e-9);
-    //    pOptLocalD->set_xtol_rel(1e-9);
-    //    pOptLocalD->set_xtol_abs(1e-9);
-
     if (pParam->printProcess)
         cout << "Global Optimization:" << endl;
 
@@ -332,14 +302,6 @@ void SphericalSolveFcn(Param *pParam, double *pOptIndividual, double &optValue)
         cout << "Local Optimization:" << endl;
 
     pOptLocalN->optimize(optXLocalN, optFLocalN);
-
-    //    optXLocalD = optXLocalN;
-    //    optFLocalD = optFLocalN;
-
-    //    pOptLocalD->optimize(optXLocalD, optFLocalD);
-
-    //    memcpy(pOptIndividual, optXLocalD.data(), dim*sizeof(double));
-    //    return optFLocalD;
 
     memcpy(pOptIndividual, optXLocalN.data(), dim * sizeof(double));
     optValue = optFLocalN;
@@ -539,53 +501,85 @@ void CartesianBoundaryFcn(const double *pExtState, double tmP, double tmE, doubl
 }
 
 void CartesianFitnessFcn(const double *pIndividual, const double *pK, const double *pStateP0, const double *pStateE0,
-                         double tmP, double tmE, double du, double tu, double &fitness)
+                         double tmP, double tmE, double du, double tu, double &fitness, bool normProcess)
 {
-    static auto norm_fcn = [](const double *pExtState, double du, double tu, double *pNormExtState) {
-        for (int i = 0; i < 3; i++)
+    // 这里不知道为何，如果用[&]第二次进入normProcess无论如何就会变为false(0)
+    static auto norm_fcn = [=](const double *pExtState, double du, double tu, double *pNormExtState) {
+        if (normProcess)
         {
-            double vu = du / tu;
-            pNormExtState[i] = pExtState[i] / du;
-            pNormExtState[6 + i] = pExtState[6 + i] / du;
-            pNormExtState[3 + i] = pExtState[3 + i] / vu;
-            pNormExtState[9 + i] = pExtState[9 + i] / vu;
+            for (int i = 0; i < 3; i++)
+            {
+                double vu = du / tu;
+                pNormExtState[i] = pExtState[i] / du;
+                pNormExtState[6 + i] = pExtState[6 + i] / du;
+                pNormExtState[3 + i] = pExtState[3 + i] / vu;
+                pNormExtState[9 + i] = pExtState[9 + i] / vu;
+            }
+        }
+        else
+        {
+            memcpy(pNormExtState, pExtState, g_DOUBLE_12);
         }
         memcpy(pNormExtState + 12, pExtState + 12, g_DOUBLE_12);
     };
 
-    static auto denorm_fcn = [](const double *pExtState, double du, double tu, double *pDenormExtState) {
-        for (int i = 0; i < 3; i++)
+    static auto denorm_fcn = [=](const double *pExtState, double du, double tu, double *pDenormExtState) {
+        if (normProcess)
         {
-            double vu = du / tu;
-            pDenormExtState[i] = pExtState[i] * du;
-            pDenormExtState[6 + i] = pExtState[6 + i] * du;
-            pDenormExtState[3 + i] = pExtState[3 + i] * vu;
-            pDenormExtState[9 + i] = pExtState[9 + i] * vu;
+
+            for (int i = 0; i < 3; i++)
+            {
+                double vu = du / tu;
+                pDenormExtState[i] = pExtState[i] * du;
+                pDenormExtState[6 + i] = pExtState[6 + i] * du;
+                pDenormExtState[3 + i] = pExtState[3 + i] * vu;
+                pDenormExtState[9 + i] = pExtState[9 + i] * vu;
+            }
+        }
+        else
+        {
+            memcpy(pDenormExtState, pExtState, g_DOUBLE_12);
         }
         memcpy(pDenormExtState + 12, pExtState + 12, g_DOUBLE_12);
     };
 
     double gu = du / tu / tu;
     double mu = du * du * du / tu / tu;
-    double param[2] = {tmP / gu, tmE / gu};
+    double param[3];
 
-    gsl_odeiv2_system normOdeSystem = {
+    if (normProcess)
+    {
+        param[0] = tmP / gu;
+        param[1] = tmE / gu;
+        param[2] = 1;
+    }
+    else
+    {
+        param[0] = tmP;
+        param[1] = tmE;
+        param[2] = mu;
+    }
+
+    gsl_odeiv2_system odeSystem = {
         [](double t, const double y[], double f[], void *params) -> int {
             (void)(t);
-            double normTmP = *((double *)params);
-            double normTmE = *((double *)params + 1);
+            double tmP = *((double *)params);
+            double tmE = *((double *)params + 1);
+            double mu = *((double *)params + 2);
 
-            CartesianExtStateFcn(y, normTmP, normTmE, 1, f);
+            CartesianExtStateFcn(y, tmP, tmE, mu, f);
 
             return GSL_SUCCESS;
         },
         nullptr, 24, param};
-    gsl_odeiv2_driver *normOdeDriver =
-        gsl_odeiv2_driver_alloc_y_new(&normOdeSystem, gsl_odeiv2_step_rkf45, 1e-3, 1e-6, 1e-6);
+    gsl_odeiv2_driver *odeDriver =
+        gsl_odeiv2_driver_alloc_y_new(&odeSystem, gsl_odeiv2_step_rkf45, 1e-3, 1e-6, 1e-6);
 
     double t = .0, tf, gExtState[24], gNormExtState[24];
 
     tf = pIndividual[12];
+    if (!normProcess)
+        tf *= tu;
 
     memcpy(gExtState, pStateP0, g_DOUBLE_6);
     memcpy(gExtState + 6, pStateE0, g_DOUBLE_6);
@@ -593,7 +587,7 @@ void CartesianFitnessFcn(const double *pIndividual, const double *pK, const doub
     memcpy(gExtState + 18, pIndividual + 6, g_DOUBLE_6);
     norm_fcn(gExtState, du, tu, gNormExtState);
 
-    int status = gsl_odeiv2_driver_apply(normOdeDriver, &t, tf, gNormExtState);
+    int status = gsl_odeiv2_driver_apply(odeDriver, &t, tf, gNormExtState);
     if (status != GSL_SUCCESS)
     {
         printf("error, return value=%d\n", status);
@@ -619,7 +613,6 @@ void CartesianSolveFcn(Param *pParam, double *pOptIndividual, double &optValue)
 
     auto *pOptGlobal = new nlopt::opt(nlopt::algorithm::GN_ISRES, dim);
     auto *pOptLocalN = new nlopt::opt(nlopt::algorithm::LN_NELDERMEAD, dim);
-    // auto *pOptLocalD = new nlopt::opt(nlopt::algorithm::LD_MMA, dim);
 
     auto optXGlobal = std::vector<double>(dim, 0);
     double optFGlobal = .0;
@@ -627,15 +620,11 @@ void CartesianSolveFcn(Param *pParam, double *pOptIndividual, double &optValue)
     auto optXLocalN = std::vector<double>(dim, 0);
     double optFLocalN = .0;
 
-    // auto optXLocalD = std::vector<double>(dim, 0);
-    // double optFLocalD = .0;
-
     for (int i = 0; i < dim; i++)
     {
         double temp = (pParam->lb[i] + pParam->ub[i]) / 2.0;
         optXGlobal[i] = temp;
         optXLocalN[i] = temp;
-        // optXLocalD[i] = temp;
     }
 
     auto lb = std::vector<double>(pParam->lb, pParam->lb + dim);
@@ -645,25 +634,8 @@ void CartesianSolveFcn(Param *pParam, double *pOptIndividual, double &optValue)
         auto p = (Param *)f_data;
         double result;
         CartesianFitnessFcn(x.data(), p->pK, p->pInitialStateP, p->pInitialStateE,
-                            p->tmP, p->tmE, p->du, p->tu, result);
+                            p->tmP, p->tmE, p->du, p->tu, result, p->normProcess);
         const unsigned int dim = CARTESIAN_INDIVIDUAL_SIZE;
-
-        // if (!grad.empty()) {
-        //     double delta = 1e-8;
-        //     double tempX[dim];
-        //     double f1, f2;
-        //     memcpy(tempX, x.data(), dim*sizeof(double));
-        //     for (int i = 0; i < dim; i++) {
-        //         tempX[i] += delta/2;
-        //         f1 = CartesianFitnessFcn(tempX, p->pK, p->pInitialStateP, p->pInitialStateE,
-        //                                  p->tmP, p->tmE, p->du, p->tu);
-        //         tempX[i] -= delta;
-        //         f2 = CartesianFitnessFcn(tempX, p->pK, p->pInitialStateP, p->pInitialStateE,
-        //                                  p->tmP, p->tmE, p->du, p->tu);
-        //         tempX[i] += delta/2;
-        //         grad[i] = (f1 - f2)/delta;
-        //     }
-        // }
 
         if (p->printProcess)
             cout << x.data()[dim - 1] << '\t' << result << endl;
@@ -687,14 +659,6 @@ void CartesianSolveFcn(Param *pParam, double *pOptIndividual, double &optValue)
     pOptLocalN->set_xtol_rel(1e-6);
     pOptLocalN->set_xtol_abs(1e-6);
 
-    // pOptLocalD->set_min_objective(objective, pParam);
-    // pOptLocalD->set_lower_bounds(lb);
-    // pOptLocalD->set_upper_bounds(ub);
-    // pOptLocalD->set_ftol_rel(1e-9);
-    // pOptLocalD->set_ftol_abs(1e-9);
-    // pOptLocalD->set_xtol_rel(1e-9);
-    // pOptLocalD->set_xtol_abs(1e-9);
-
     if (pParam->printProcess)
         cout << "Global Optimization:" << endl;
 
@@ -707,11 +671,6 @@ void CartesianSolveFcn(Param *pParam, double *pOptIndividual, double &optValue)
         cout << "Local Optimization:" << endl;
 
     pOptLocalN->optimize(optXLocalN, optFLocalN);
-
-    // optXLocalD = optXLocalN;
-    // optFLocalD = optFLocalN;
-
-    // pOptLocalD->optimize(optXLocalD, optFLocalD);
 
     memcpy(pOptIndividual, optXLocalN.data(), dim * sizeof(double));
     optValue = optFLocalN;
@@ -814,9 +773,9 @@ extern "C"
 
     //  笛卡尔坐标系适应度函数
     void cartesian_fitness_fcn(const double *pIndividual, const double *pK, const double *pStateP0, const double *pStateE0,
-                               double tmP, double tmE, double du, double tu, double &fitness)
+                               double tmP, double tmE, double du, double tu, double &fitness, bool norm_process)
     {
-        CartesianFitnessFcn(pIndividual, pK, pStateP0, pStateE0, tmP, tmE, du, tu, fitness);
+        CartesianFitnessFcn(pIndividual, pK, pStateP0, pStateE0, tmP, tmE, du, tu, fitness, norm_process);
     }
 
     //  求解笛卡尔坐标系

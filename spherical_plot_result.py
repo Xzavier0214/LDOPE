@@ -12,8 +12,8 @@ import spherical_solve
 case_index = 3
 index = 1
 
-state_p0 = spherical_solve.cases[case_index - 1][0]
-state_e0 = spherical_solve.cases[case_index - 1][1]
+state_p0 = spherical_solve.CASES[case_index - 1][0]
+state_e0 = spherical_solve.CASES[case_index - 1][1]
 state_p0_norm = ldope.spherical_state_norm_fcn(state_p0)
 state_e0_norm = ldope.spherical_state_norm_fcn(state_e0)
 
@@ -21,14 +21,14 @@ read_line = 1
 with open('./data/spherical/{}.data'.format(case_index), 'r') as data:
     for each_line in data:
         if read_line < index:
-            index += 1
+            read_line += 1
             continue
         temp = each_line.split(' ')
         individual = [
-            float(ele) for ele in temp[0:ldope.SPHERICAL_INDIVIDUAL_SIZE]
+            float(ele) for ele in temp[2:ldope.SPHERICAL_INDIVIDUAL_SIZE + 2]
         ]
-        opt_value = float(temp[ldope.SPHERICAL_INDIVIDUAL_SIZE])
-        time_cost = float(temp[ldope.SPHERICAL_INDIVIDUAL_SIZE + 1])
+        opt_value = float(temp[0])
+        time_cost = float(temp[1])
         break
 
 costate_p0, costate_e0, tf_norm = ldope.spherical_individual_convert_fcn(

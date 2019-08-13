@@ -202,7 +202,8 @@ class Param(ctypes.Structure):
                 ('ub', ctypes.POINTER(ctypes.c_double)),
                 ('pK', ctypes.POINTER(ctypes.c_double)),
                 ('du', ctypes.c_double), ('tu', ctypes.c_double),
-                ('printProcess', ctypes.c_bool)]
+                ('printProcess', ctypes.c_bool),
+                ('normProcess', ctypes.c_bool)]
 
 
 def spherical_solve_fcn(initial_state_p,
@@ -240,7 +241,8 @@ def cartesian_solve_fcn(initial_state_p,
                         initial_state_e,
                         lb,
                         ub,
-                        print_process=True):
+                        print_process=True,
+                        norm_process=True):
     initial_state_p_c = cartesian_state_type(*initial_state_p)
     initial_state_e_c = cartesian_state_type(*initial_state_e)
     lb_c = cartesian_individual_type(*lb)
@@ -255,7 +257,8 @@ def cartesian_solve_fcn(initial_state_p,
                   pK=k_c,
                   du=DU,
                   tu=TU,
-                  printProcess=print_process)
+                  printProcess=print_process,
+                  normProcess=norm_process)
     opt_individual_c = cartesian_individual_type()
     opt_value_c = ctypes.c_double()
 

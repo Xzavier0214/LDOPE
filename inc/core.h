@@ -15,6 +15,7 @@ struct Param
     double du;              // 距离归一化系数（非归一化）
     double tu;              // 时间归一化系数（非归一化）
     bool printProcess;      // 打印计算过程
+    bool normProcess;       // 归一化计算过程，仅对笛卡尔模型有效
 };
 
 //////////////////////////球坐标系//////////////////////////
@@ -72,7 +73,7 @@ void CartesianBoundaryFcn(const double *pExtState, double tmP, double tmE, doubl
 
 //  笛卡尔坐标系适应度函数
 void CartesianFitnessFcn(const double *pIndividual, const double *pK, const double *pStateP0, const double *pStateE0,
-                         double tmP, double tmE, double du, double tu, double &fitness);
+                         double tmP, double tmE, double du, double tu, double &fitness, bool normProcess=true);
 
 //  求解笛卡尔坐标系
 void CartesianSolveFcn(Param *pParam, double *pOptIndividual, double &optValue);
@@ -131,7 +132,7 @@ extern "C"
 
     //  笛卡尔坐标系适应度函数
     void cartesian_fitness_fcn(const double *pIndividual, const double *pK, const double *pStateP0, const double *pStateE0,
-                               double tmP, double tmE, double du, double tu, double &fitness);
+                               double tmP, double tmE, double du, double tu, double &fitness, bool norm_process=true);
 
     //  求解笛卡尔坐标系
     void cartesian_solve_fcn(Param *pParam, double *pOptIndividual, double &optValue);

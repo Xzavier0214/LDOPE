@@ -10,25 +10,28 @@ import cartesian_solve
 
 #%% 初始化
 case_index = 3
+
+norm_index = 1
 index = 1
 
-state_p0 = cartesian_solve.cases[case_index - 1][0]
-state_e0 = cartesian_solve.cases[case_index - 1][1]
+state_p0 = cartesian_solve.CASES[case_index - 1][0]
+state_e0 = cartesian_solve.CASES[case_index - 1][1]
 state_p0_norm = ldope.cartesian_state_norm_fcn(state_p0)
 state_e0_norm = ldope.cartesian_state_norm_fcn(state_e0)
 
+#%% 读取归一化计算结果
 read_line = 1
-with open('./data/cartesian/{}.data'.format(case_index), 'r') as data:
+with open('./data/cartesian/{}_norm.data'.format(case_index), 'r') as data:
     for each_line in data:
-        if read_line < index:
-            index += 1
+        if read_line < norm_index:
+            read_line += 1
             continue
         temp = each_line.split(' ')
         individual = [
-            float(ele) for ele in temp[0:ldope.CARTESIAN_INDIVIDUAL_SIZE]
+            float(ele) for ele in temp[2:ldope.CARTESIAN_INDIVIDUAL_SIZE + 2]
         ]
-        opt_value = float(temp[ldope.CARTESIAN_INDIVIDUAL_SIZE])
-        time_cost = float(temp[ldope.CARTESIAN_INDIVIDUAL_SIZE + 1])
+        opt_value = float(temp[0])
+        time_cost = float(temp[1])
         break
 
 costate_p0, costate_e0, tf_norm = ldope.cartesian_individual_convert_fcn(
@@ -97,6 +100,24 @@ ax.scatter(xe[0],
 ax.plot(xp, yp, zp, 'r-', label='Pursuer Trajectory')
 ax.plot(xe, ye, ze, 'g--', label='Evader Trajectory')
 ax.legend()
+
+#%% 读取常规计算结果
+read_line = 1
+with open('./data/cartesian/{}.data'.format(case_index), 'r') as data:
+    for each_line in data:
+        if read_line < index:
+            read_line += 1
+            continue
+        temp = each_line.split(' ')
+        individual = [
+            float(ele) for ele in temp[2:ldope.CARTESIAN_INDIVIDUAL_SIZE + 2]
+        ]
+        opt_value = float(temp[0])
+        time_cost = float(temp[1])
+        break
+
+costate_p0, costate_e0, tf_norm = ldope.cartesian_individual_convert_fcn(
+    individual)
 
 #%% 计算常规结果
 step = 0.05 * ldope.TU
