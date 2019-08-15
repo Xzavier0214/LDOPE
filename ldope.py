@@ -167,7 +167,21 @@ def cartesian_state_norm_fcn(state):
 
 
 #%% 核心函数的定义
-def spherical_ext_state_fcn(ext_state, norm=False):
+def spherical_control_fcn(state, costate, flag='p'):
+    state_c = spherical_state_type(*state)
+    costate_c = spherical_costate_type(*costate)
+    if flag == 'p':
+        flag_c = ctypes.c_int(-1)
+    elif flag == 'e':
+        flag_c = ctypes.c_int(1)
+    control_c = spherical_control_type()
+
+    ldope.spherical_control_fcn(state_c, costate_c, flag_c, control_c)
+
+    return tuple(control_c)
+
+
+def spherical_ext_state_fcn(ext_state, norm=True):
     ext_state_c = spherical_ext_state_type(*ext_state)
     dot_ext_state_c = spherical_ext_state_type()
 
@@ -180,7 +194,21 @@ def spherical_ext_state_fcn(ext_state, norm=False):
     return tuple(dot_ext_state_c)
 
 
-def cartesian_ext_state_fcn(ext_state, norm=False):
+def cartesian_control_fcn(state, costate, flag='p'):
+    state_c = cartesian_state_type(*state)
+    costate_c = cartesian_costate_type(*costate)
+    if flag == 'p':
+        flag_c = ctypes.c_int(-1)
+    elif flag == 'e':
+        flag_c = ctypes.c_int(1)
+    control_c = cartesian_control_type()
+
+    ldope.cartesian_control_fcn(state_c, costate_c, flag_c, control_c)
+
+    return tuple(control_c)
+
+
+def cartesian_ext_state_fcn(ext_state, norm=True):
     ext_state_c = cartesian_ext_state_type(*ext_state)
     dot_ext_state_c = cartesian_ext_state_type()
 

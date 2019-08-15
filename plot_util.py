@@ -1,34 +1,16 @@
 import matplotlib.pyplot as plt
+from matplotlib import ticker
 from mpl_toolkits.mplot3d import Axes3D
 import seaborn
 import ldope
 
 
-def plot_norm_frame(fig_name):
-    fig_norm = plt.figure(fig_name)
-    ax = fig_norm.gca(projection='3d')
-
-    ax.scatter(0,
-               0,
-               0,
-               color=seaborn.xkcd_rgb['black'],
-               s=50,
-               label='Earth Center')
-
-    ax.set_xlabel(r'$\bar{x}$' + ' (normalized x)')
-    ax.set_ylabel(r'$\bar{y}$' + ' (normalized y)')
-    ax.set_zlabel(r'$\bar{z}$' + ' (normalized z)')
-    ax.set_xlim(-1, 1)
-    ax.set_ylim(-1, 1)
-    ax.set_zlim(-1, 1)
-
-    return fig_norm
-
-
-def plot_frame(fig_name):
-    fig = plt.figure(fig_name)
+# 绘制3D坐标轴
+def plot_3D_frame(num, norm=True):
+    fig = plt.figure(num)
     ax = fig.gca(projection='3d')
 
+    # 绘制地球
     ax.scatter(0,
                0,
                0,
@@ -36,11 +18,74 @@ def plot_frame(fig_name):
                s=50,
                label='Earth Center')
 
-    ax.set_xlabel(r'$\bar{x}$' + ' (x)')
-    ax.set_ylabel(r'$\bar{y}$' + ' (y)')
-    ax.set_zlabel(r'$\bar{z}$' + ' (z)')
-    ax.set_xlim(-1 * ldope.DU, 1 * ldope.DU)
-    ax.set_ylim(-1 * ldope.DU, 1 * ldope.DU)
-    ax.set_zlim(-1 * ldope.DU, 1 * ldope.DU)
+    if norm:
+        ax.set_xlabel(r'$\bar{x}$' + ' (normalized x)')
+        ax.set_ylabel(r'$\bar{y}$' + ' (normalized y)')
+        ax.set_zlabel(r'$\bar{z}$' + ' (normalized z)')
+        ax.set_xlim(-1, 1)
+        ax.set_ylim(-1, 1)
+        ax.set_zlim(-1, 1)
+    else:
+        ax.set_xlabel(r'$x$' + r' ($x10^6$)')
+        ax.set_ylabel(r'$y$' + r' ($x10^6$)')
+        ax.set_zlabel(r'$z$' + r' ($x10^6$)')
+        ax.set_xlim(-1 * ldope.DU, 1 * ldope.DU)
+        ax.set_ylim(-1 * ldope.DU, 1 * ldope.DU)
+        ax.set_zlim(-1 * ldope.DU, 1 * ldope.DU)
 
-    return fig
+    if not norm:
+
+        def formatnum(x, pos):
+            return '$%.2f$' % (x / 1e6)
+
+        formatter = ticker.FuncFormatter(formatnum)
+
+        ax.xaxis.set_major_formatter(formatter)
+        ax.yaxis.set_major_formatter(formatter)
+        ax.zaxis.set_major_formatter(formatter)
+
+    return fig, ax
+
+
+# 绘制控制变量坐标轴
+def plot_control_frame(num):
+    fig_control, (ax_control_alpha, ax_control_beta) = plt.subplots(2,
+                                                                    1,
+                                                                    num=num)
+
+    ax2_alpha = ax_control_alpha.twinx()
+    ax2_beta = ax_control_beta.twinx()
+
+    ax_control_alpha.set_xlabel(r'$\bar{t}$' + r' (normalized time)')
+    ax_control_beta.set_xlabel(r'$\bar{t}$' + r' (normalized time)')
+
+    ax_control_alpha.grid()
+    ax_control_beta.grid()
+
+    return fig_control, (ax_control_alpha, ax2_alpha, ax_control_beta,
+                         ax2_beta)
+
+
+# 绘制时间-距离坐标轴
+def plot_tr_frame(num, norm=True):
+    fig = plt.figure(num)
+    ax = fig.gca()
+
+    if norm:
+        ax.set_xlabel(r'$\bar{t}$' + r' (normalized time)')
+        ax.set_ylabel(r'$\bar{D}$' + r' (normalized distance)')
+    else:
+        ax.set_xlabel(r'$t$' + r' (time)')
+        ax.set_ylabel(r'$D$' + r' (distance)')
+
+    if not norm:
+        formatter = ticker.ScalarFormatter(useMathText=True)
+        formatter.set_scientific(True)
+        formatter.set_powerlimits((-1, 2))
+
+        ax.xaxis.set_major_formatter(formatter)
+        ax.yaxis.set_major_formatter(formatter)
+
+    ax.grid()
+
+    return fig, ax
