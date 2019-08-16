@@ -1,8 +1,9 @@
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
-from numpy import sin, cos, sqrt
+from numpy import sin, cos, sqrt, pi
 import seaborn
+from scipy.interpolate import interp1d
 from scipy.integrate import solve_ivp
 import ldope
 import solve_spherical_model
@@ -34,7 +35,8 @@ def plot_spherical_initial_point(case_index,
                                  p_color=seaborn.xkcd_rgb['red'],
                                  e_color=seaborn.xkcd_rgb['green'],
                                  p_label='Initial Position P',
-                                 e_label='Initial Position E'):
+                                 e_label='Initial Position E',
+                                 side='both'):
     # 初始状态
     state_p0 = solve_spherical_model.CASES[case_index - 1][0]
     state_e0 = solve_spherical_model.CASES[case_index - 1][1]
@@ -54,8 +56,10 @@ def plot_spherical_initial_point(case_index,
     ze = (r_e * sin(phi_e))
 
     # 绘制
-    ax.scatter(xp, yp, zp, color=p_color, marker='*', s=50, label=p_label)
-    ax.scatter(xe, ye, ze, color=e_color, marker='s', s=25, label=e_label)
+    if side == 'both' or side == 'p':
+        ax.scatter(xp, yp, zp, color=p_color, marker='*', s=50, label=p_label)
+    if side == 'both' or side == 'e':
+        ax.scatter(xe, ye, ze, color=e_color, marker='s', s=25, label=e_label)
 
 
 # 根据个体绘制轨道结果
@@ -68,7 +72,8 @@ def plot_spherical_trajectory(case_index,
                               p_linestyle='-',
                               e_linestyle='--',
                               p_label='Trajectory P in SM',
-                              e_label='Trajectory E in SM'):
+                              e_label='Trajectory E in SM',
+                              side='both'):
     # 初始状态量
     state_p0 = solve_spherical_model.CASES[case_index - 1][0]
     state_e0 = solve_spherical_model.CASES[case_index - 1][1]
@@ -102,11 +107,10 @@ def plot_spherical_trajectory(case_index,
     # 绘制向量计算
     xp, yp, zp = [], [], []
     xe, ye, ze = [], [], []
-    for i in range(len(result.t)):
-        split_state = result.y.T[i]
-        r_p, r_e = split_state[0], split_state[6]
-        xi_p, xi_e = split_state[3], split_state[9]
-        phi_p, phi_e = split_state[4], split_state[10]
+    for each_state in result.y.T:
+        r_p, r_e = each_state[0], each_state[6]
+        xi_p, xi_e = each_state[3], each_state[9]
+        phi_p, phi_e = each_state[4], each_state[10]
         xp.append(r_p * cos(phi_p) * cos(xi_p))
         yp.append(r_p * cos(phi_p) * sin(xi_p))
         zp.append(r_p * sin(phi_p))
@@ -115,8 +119,20 @@ def plot_spherical_trajectory(case_index,
         ze.append(r_e * sin(phi_e))
 
     # 绘制
-    ax.plot(xp, yp, zp, color=p_color, linestyle=p_linestyle, label=p_label)
-    ax.plot(xe, ye, ze, color=e_color, linestyle=p_linestyle, label=e_label)
+    if side == 'both' or side == 'p':
+        ax.plot(xp,
+                yp,
+                zp,
+                color=p_color,
+                linestyle=p_linestyle,
+                label=p_label)
+    if side == 'both' or side == 'e':
+        ax.plot(xe,
+                ye,
+                ze,
+                color=e_color,
+                linestyle=e_linestyle,
+                label=e_label)
 
 
 # 根据个体绘制控制变量
@@ -158,15 +174,15 @@ def plot_spherical_control(case_index,
     alpha_p, alpha_e = [], []
     beta_p, beta_e = [], []
     for i, t in enumerate(result.t):
-        split_state = result.y.T[i]
+        each_state = result.y.T[i]
         t_line.append(t)
-        control_p = ldope.spherical_control_fcn(split_state[0:6],
-                                                split_state[12:18], 'p')
+        control_p = ldope.spherical_control_fcn(each_state[0:6],
+                                                each_state[12:18], 'p')
         alpha_p.append(control_p[0])
         beta_p.append(control_p[1])
 
-        control_e = ldope.spherical_control_fcn(split_state[6:12],
-                                                split_state[18:24], 'e')
+        control_e = ldope.spherical_control_fcn(each_state[6:12],
+                                                each_state[18:24], 'e')
         alpha_e.append(control_e[0])
         beta_e.append(control_e[1])
 
@@ -205,13 +221,13 @@ def plot_spherical_control(case_index,
 
 
 # 绘制时间-距离
-def plot_spherical_tr(case_index,
+def plot_spherical_td(case_index,
                       individual,
                       ax,
                       norm=True,
                       color=seaborn.xkcd_rgb['red'],
                       linestyle='-',
-                      label='t vs. r'):
+                      label='t vs. D'):
     # 初始状态量
     state_p0 = solve_spherical_model.CASES[case_index - 1][0]
     state_e0 = solve_spherical_model.CASES[case_index - 1][1]
@@ -247,10 +263,10 @@ def plot_spherical_tr(case_index,
     t_line = []
     for i, t in enumerate(result.t):
         t_line.append(t)
-        split_state = result.y.T[i]
-        r_p, r_e = split_state[0], split_state[6]
-        xi_p, xi_e = split_state[3], split_state[9]
-        phi_p, phi_e = split_state[4], split_state[10]
+        each_state = result.y.T[i]
+        r_p, r_e = each_state[0], each_state[6]
+        xi_p, xi_e = each_state[3], each_state[9]
+        phi_p, phi_e = each_state[4], each_state[10]
         xp = r_p * cos(phi_p) * cos(xi_p)
         yp = r_p * cos(phi_p) * sin(xi_p)
         zp = r_p * sin(phi_p)
@@ -267,6 +283,382 @@ def plot_spherical_tr(case_index,
     #         r[-3],
     #         '(' + ('%.2f' % t_line[-1]) + ', ' + ('%.2f' % r[-1]) + ')',
     #         fontsize=10)
+
+
+# 绘制时间-半径图
+def plot_spherical_tr(case_index,
+                      individual,
+                      ax_p,
+                      ax_e,
+                      p_color=seaborn.xkcd_rgb['red'],
+                      p_linestyle='-',
+                      p_label='Pursuer t vs. r',
+                      e_color=seaborn.xkcd_rgb['green'],
+                      e_linestyle='--',
+                      e_label='Evader t vs. r'):
+    # 初始状态量
+    state_p0 = solve_spherical_model.CASES[case_index - 1][0]
+    state_e0 = solve_spherical_model.CASES[case_index - 1][1]
+    state_p0 = ldope.spherical_state_norm_fcn(state_p0)
+    state_e0 = ldope.spherical_state_norm_fcn(state_e0)
+
+    # 初始协态量
+    costate_p0, costate_e0, tf_norm = ldope.spherical_individual_convert_fcn(
+        individual)
+
+    # 积分时段
+    step = 0.05
+    t_span = 0, tf_norm
+    t_eval = np.arange(0, tf_norm, step)
+    t_eval = np.append(t_eval, tf_norm)
+
+    # 积分
+    result = solve_ivp(
+        lambda t, y: ldope.spherical_ext_state_fcn(tuple(y.tolist()), True),
+        t_span=np.array(t_span),
+        y0=np.array(state_p0 + state_e0 + costate_p0 + costate_e0),
+        t_eval=t_eval)
+
+    # 绘制向量计算
+    t_line = []
+    r_p_line = []
+    r_e_line = []
+    for i, t in enumerate(result.t):
+        t_line.append(t)
+        each_state = result.y.T[i]
+        r_p, r_e = each_state[0], each_state[6]
+        xi_p, xi_e = each_state[3], each_state[9]
+        phi_p, phi_e = each_state[4], each_state[10]
+        xp = r_p * cos(phi_p) * cos(xi_p)
+        yp = r_p * cos(phi_p) * sin(xi_p)
+        zp = r_p * sin(phi_p)
+        xe = r_e * cos(phi_e) * cos(xi_e)
+        ye = r_e * cos(phi_e) * sin(xi_e)
+        ze = r_e * sin(phi_e)
+
+        r_p_line.append(r_p)
+        r_e_line.append(r_e)
+
+    # 绘制
+    ax_p.semilogx(t_line,
+                  r_p_line,
+                  basex=2,
+                  color=p_color,
+                  linestyle=p_linestyle,
+                  label=p_label)
+    ax_e.semilogx(t_line,
+                  r_e_line,
+                  basex=2,
+                  color=e_color,
+                  linestyle=e_linestyle,
+                  label=e_label)
+
+
+# 绘制时间-纬度图
+def plot_spherical_tphi(case_index,
+                        individual,
+                        ax_p,
+                        ax_e,
+                        p_color=seaborn.xkcd_rgb['red'],
+                        p_linestyle='-',
+                        p_label=r'Pursuer t vs. $\varphi$',
+                        e_color=seaborn.xkcd_rgb['green'],
+                        e_linestyle='--',
+                        e_label=r'Evader t vs. $\varphi$'):
+    # 初始状态量
+    state_p0 = solve_spherical_model.CASES[case_index - 1][0]
+    state_e0 = solve_spherical_model.CASES[case_index - 1][1]
+    state_p0 = ldope.spherical_state_norm_fcn(state_p0)
+    state_e0 = ldope.spherical_state_norm_fcn(state_e0)
+
+    # 初始协态量
+    costate_p0, costate_e0, tf_norm = ldope.spherical_individual_convert_fcn(
+        individual)
+
+    # 积分时段
+    step = 0.05
+    t_span = 0, tf_norm
+    t_eval = np.arange(0, tf_norm, step)
+    t_eval = np.append(t_eval, tf_norm)
+
+    # 积分
+    result = solve_ivp(
+        lambda t, y: ldope.spherical_ext_state_fcn(tuple(y.tolist()), True),
+        t_span=np.array(t_span),
+        y0=np.array(state_p0 + state_e0 + costate_p0 + costate_e0),
+        t_eval=t_eval)
+
+    # 绘制向量计算
+    t_line = []
+    phi_p_line = []
+    phi_e_line = []
+    for i, t in enumerate(result.t):
+        t_line.append(t)
+        each_state = result.y.T[i]
+        r_p, r_e = each_state[0], each_state[6]
+        xi_p, xi_e = each_state[3], each_state[9]
+        phi_p, phi_e = each_state[4], each_state[10]
+        xp = r_p * cos(phi_p) * cos(xi_p)
+        yp = r_p * cos(phi_p) * sin(xi_p)
+        zp = r_p * sin(phi_p)
+        xe = r_e * cos(phi_e) * cos(xi_e)
+        ye = r_e * cos(phi_e) * sin(xi_e)
+        ze = r_e * sin(phi_e)
+
+        phi_p_line.append(phi_p)
+        phi_e_line.append(phi_e)
+
+    # 绘制
+    ax_p.semilogx(t_line,
+                  phi_p_line,
+                  basex=2,
+                  color=p_color,
+                  linestyle=p_linestyle,
+                  label=p_label)
+    ax_e.semilogx(t_line,
+                  phi_e_line,
+                  basex=2,
+                  color=e_color,
+                  linestyle=e_linestyle,
+                  label=e_label)
+
+
+# 绘制时间经度图
+def plot_spherical_txi(case_index,
+                       individual,
+                       ax_p,
+                       ax_e,
+                       p_color=seaborn.xkcd_rgb['red'],
+                       p_linestyle='-',
+                       p_label=r'Pursuer t vs. $\xi$',
+                       e_color=seaborn.xkcd_rgb['green'],
+                       e_linestyle='--',
+                       e_label=r'Evader t vs. $\xi$',
+                       p_base_xi=0,
+                       e_base_xi=0):
+    # 初始状态量
+    state_p0 = solve_spherical_model.CASES[case_index - 1][0]
+    state_e0 = solve_spherical_model.CASES[case_index - 1][1]
+    state_p0 = ldope.spherical_state_norm_fcn(state_p0)
+    state_e0 = ldope.spherical_state_norm_fcn(state_e0)
+
+    # 初始协态量
+    costate_p0, costate_e0, tf_norm = ldope.spherical_individual_convert_fcn(
+        individual)
+
+    # 积分时段
+    step = 0.05
+    t_span = 0, tf_norm
+    t_eval = np.arange(0, tf_norm, step)
+    t_eval = np.append(t_eval, tf_norm)
+
+    # 积分
+    result = solve_ivp(
+        lambda t, y: ldope.spherical_ext_state_fcn(tuple(y.tolist()), True),
+        t_span=np.array(t_span),
+        y0=np.array(state_p0 + state_e0 + costate_p0 + costate_e0),
+        t_eval=t_eval)
+
+    # 绘制向量计算
+    t_line = []
+    xi_p_line = []
+    xi_e_line = []
+    for i, t in enumerate(result.t):
+        t_line.append(t)
+        each_state = result.y.T[i]
+        r_p, r_e = each_state[0], each_state[6]
+        xi_p, xi_e = each_state[3], each_state[9]
+        phi_p, phi_e = each_state[4], each_state[10]
+        xp = r_p * cos(phi_p) * cos(xi_p)
+        yp = r_p * cos(phi_p) * sin(xi_p)
+        zp = r_p * sin(phi_p)
+        xe = r_e * cos(phi_e) * cos(xi_e)
+        ye = r_e * cos(phi_e) * sin(xi_e)
+        ze = r_e * sin(phi_e)
+
+        xi_p_line.append(xi_p)
+        xi_e_line.append(xi_e)
+
+    # 绘制
+    ax_p.semilogx(t_line,
+                  np.array(xi_p_line[:]) - p_base_xi,
+                  basex=2,
+                  color=p_color,
+                  linestyle=p_linestyle,
+                  label=p_label)
+    ax_e.semilogx(t_line,
+                  np.array(xi_p_line[:]) - e_base_xi,
+                  basex=2,
+                  color=e_color,
+                  linestyle=e_linestyle,
+                  label=e_label)
+
+
+# 绘制采用相同控制方式图
+def plot_same_control(case_index,
+                      individual,
+                      control_case_index,
+                      control_individual,
+                      ax,
+                      p_o_color=seaborn.xkcd_rgb['red'],
+                      p_o_linestyle='-',
+                      p_o_label='P origin',
+                      e_o_color=seaborn.xkcd_rgb['green'],
+                      e_o_linestyle='--',
+                      e_o_label='E origin',
+                      p_color=seaborn.xkcd_rgb['purple'],
+                      p_linestyle='-.',
+                      p_label='P',
+                      e_color=seaborn.xkcd_rgb['blue'],
+                      e_linestyle=':',
+                      e_label='E'):
+    # 控制初始状态量
+    state_control_p0 = solve_spherical_model.CASES[control_case_index - 1][0]
+    state_control_e0 = solve_spherical_model.CASES[control_case_index - 1][1]
+    state_control_p0 = ldope.spherical_state_norm_fcn(state_control_p0)
+    state_control_e0 = ldope.spherical_state_norm_fcn(state_control_e0)
+
+    # 控制初始协态量
+    costate_control_p0, costate_control_e0, tf_control_norm = \
+        ldope.spherical_individual_convert_fcn(control_individual)
+
+    # 控制积分时段
+    step_control = 0.05
+    t_span_control = 0, tf_control_norm
+    t_eval_control = np.arange(0, tf_control_norm, step_control)
+    t_eval_control = np.append(t_eval_control, tf_control_norm)
+
+    # 积分
+    result_control = solve_ivp(
+        lambda t, y: ldope.spherical_ext_state_fcn(tuple(y.tolist()), True),
+        t_span=np.array(t_span_control),
+        y0=np.array(state_control_p0 + state_control_e0 + costate_control_p0 +
+                    costate_control_e0),
+        t_eval=t_eval_control)
+
+    # 控制向量计算
+    t_line = []
+    alpha_p, alpha_e = [], []
+    beta_p, beta_e = [], []
+    for i, t in enumerate(result_control.t):
+        t_line.append(t)
+        each_state = result_control.y.T[i]
+        control_p = ldope.spherical_control_fcn(each_state[0:6],
+                                                each_state[12:18], 'p')
+        alpha_p.append(control_p[0] if control_p[0] > -2 else control_p[0] +
+                       2 * pi)
+        beta_p.append(control_p[1] if control_p[1] > 1 else control_p[1] +
+                      2 * pi)
+
+        control_e = ldope.spherical_control_fcn(each_state[6:12],
+                                                each_state[18:24], 'e')
+        alpha_e.append(control_e[0])
+        beta_e.append(control_e[1])
+
+    alpha_p_fcn = interp1d(t_line, alpha_p, kind='cubic')
+    beta_p_fcn = interp1d(t_line, beta_p, kind='cubic')
+
+    alpha_e_fcn = interp1d(t_line, alpha_e, kind='cubic')
+    beta_e_fcn = interp1d(t_line, beta_e, kind='cubic')
+
+    def state_p_fcn(t, y: np.ndarray):
+        return ldope.spherical_state_fcn(tuple(y.tolist()),
+                                         (alpha_p_fcn(t), beta_p_fcn(t)),
+                                         side='p',
+                                         norm=True)
+
+    def state_e_fcn(t, y: np.ndarray):
+        return ldope.spherical_state_fcn(tuple(y.tolist()),
+                                         (alpha_e_fcn(t), beta_e_fcn(t)),
+                                         side='e',
+                                         norm=True)
+
+    # 初始状态量
+    state_p0 = solve_spherical_model.CASES[case_index - 1][0]
+    state_e0 = solve_spherical_model.CASES[case_index - 1][1]
+    state_p0 = ldope.spherical_state_norm_fcn(state_p0)
+    state_e0 = ldope.spherical_state_norm_fcn(state_e0)
+
+    # 初始协态量
+    costate_p0, costate_e0, tf_norm = ldope.spherical_individual_convert_fcn(
+        individual)
+
+    # 积分时段
+    step = 0.05
+    t_span = 0, tf_norm
+    t_eval = np.arange(0, tf_norm, step)
+    t_eval = np.append(t_eval, tf_norm)
+
+    print(tf_control_norm)
+    print(tf_norm)
+
+    # 积分
+    result_o = solve_ivp(
+        lambda t, y: ldope.spherical_ext_state_fcn(tuple(y.tolist()), True),
+        t_span=np.array(t_span),
+        y0=np.array(state_p0 + state_e0 + costate_p0 + costate_e0),
+        t_eval=t_eval)
+    result_p = solve_ivp(state_p_fcn,
+                         t_span=np.array(t_span),
+                         y0=np.array(state_p0),
+                         t_eval=t_eval)
+    result_e = solve_ivp(state_e_fcn,
+                         t_span=np.array(t_span),
+                         y0=np.array(state_e0),
+                         t_eval=t_eval)
+
+    # 绘制向量计算
+    xp_o, yp_o, zp_o = [], [], []
+    xe_o, ye_o, ze_o = [], [], []
+    for each_state in result_o.y.T:
+        r_p, r_e = each_state[0], each_state[6]
+        xi_p, xi_e = each_state[3], each_state[9]
+        phi_p, phi_e = each_state[4], each_state[10]
+        xp_o.append(r_p * cos(phi_p) * cos(xi_p))
+        yp_o.append(r_p * cos(phi_p) * sin(xi_p))
+        zp_o.append(r_p * sin(phi_p))
+        xe_o.append(r_e * cos(phi_e) * cos(xi_e))
+        ye_o.append(r_e * cos(phi_e) * sin(xi_e))
+        ze_o.append(r_e * sin(phi_e))
+
+    xp, yp, zp = [], [], []
+    for each_state in result_p.y.T:
+        r_p = each_state[0]
+        xi_p = each_state[3]
+        phi_p = each_state[4]
+        xp.append(r_p * cos(phi_p) * cos(xi_p))
+        yp.append(r_p * cos(phi_p) * sin(xi_p))
+        zp.append(r_p * sin(phi_p))
+
+    xe, ye, ze = [], [], []
+    for each_state in result_e.y.T:
+        r_e = each_state[0]
+        xi_e = each_state[3]
+        phi_e = each_state[4]
+        xe.append(r_e * cos(phi_e) * cos(xi_e))
+        ye.append(r_e * cos(phi_e) * sin(xi_e))
+        ze.append(r_e * sin(phi_e))
+
+    # 绘制
+    ax.plot(xp_o,
+            yp_o,
+            zp_o,
+            color=p_o_color,
+            linestyle=p_o_linestyle,
+            label=p_o_label)
+    ax.plot(xe_o,
+            ye_o,
+            ze_o,
+            color=e_o_color,
+            linestyle=e_o_linestyle,
+            label=e_o_label)
+    ax.plot(xp, yp, zp, color=p_color, linestyle=p_linestyle, label=p_label)
+    ax.plot(xe_o,
+            ye_o,
+            ze_o,
+            color=e_color,
+            linestyle=e_linestyle,
+            label=e_label)
 
 
 if __name__ == "__main__":
@@ -299,14 +691,14 @@ if __name__ == "__main__":
                            ax2_alpha, ax_control_beta, ax2_beta)
 
     # 绘制时间-距离坐标轴
-    fig_tr_norm, ax_tr_norm = plot_util.plot_tr_frame(
+    fig_tr_norm, ax_tr_norm = plot_util.plot_td_frame(
         'case {} tr norm frame'.format(case_index), True)
-    fig_tr, ax_tr = plot_util.plot_tr_frame(
+    fig_tr, ax_tr = plot_util.plot_td_frame(
         'case {} tr frame'.format(case_index), False)
 
     # 绘制时间-距离图
-    plot_spherical_tr(case_index, individual_norm, ax_tr_norm, True)
-    plot_spherical_tr(case_index, individual, ax_tr, False)
+    plot_spherical_td(case_index, individual_norm, ax_tr_norm, True)
+    plot_spherical_td(case_index, individual, ax_tr, False)
 
     # 显示图例
     ax_norm.legend()

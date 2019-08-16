@@ -59,6 +59,12 @@ for case_index in range(1, 4):
         p_linestyle='-.',
         e_linestyle=':')
 
+    ax_norm.legend()
+    ax_control_alpha_p.legend(loc='upper center')
+    ax_control_alpha_e.legend(loc='upper center')
+    ax_control_beta_p.legend(loc='upper center')
+    ax_control_beta_e.legend(loc='upper center')
+
     # 调整图比例
     fig_norm.tight_layout()
     fig_control.tight_layout()

@@ -16,7 +16,18 @@ CASE_2 = ((7037.658e3, 7.438e3, deg2rad(-2.1), deg2rad(-84.9), deg2rad(-29.9),
 CASE_3 = ((6700e3, 7.713e3, deg2rad(0), deg2rad(170), deg2rad(0), deg2rad(70)),
           (7800e3, 7.149e3, deg2rad(0), deg2rad(210), deg2rad(0), deg2rad(10)))
 
-CASES = (CASE_1, CASE_2, CASE_3)
+CASE_4 = ((6578.165e3, 7.784e3, 0, deg2rad(20), 0, deg2rad(30.0)),
+          (6578.165e3, 7.784e3, 0, deg2rad(46.5), deg2rad(7.6), deg2rad(49.6)))
+CASE_5 = ((6578.165e3, 7.784e3, 0, deg2rad(40), 0, deg2rad(30.0)),
+          (6578.165e3, 7.784e3, 0, deg2rad(66.5), deg2rad(7.6), deg2rad(49.6)))
+CASE_6 = ((6578.165e3, 7.784e3, 0, deg2rad(60), 0, deg2rad(30.0)),
+          (6578.165e3, 7.784e3, 0, deg2rad(86.5), deg2rad(7.6), deg2rad(49.6)))
+
+CASE_7 = ((6578.165e3, 7.784e3, 0, deg2rad(10), 0, deg2rad(30.0)),
+          (6578.165e3, 7.784e3, 0, deg2rad(36.466), deg2rad(7.644),
+           deg2rad(49.367)))
+
+CASES = (CASE_1, CASE_2, CASE_3, CASE_4, CASE_5, CASE_6, CASE_7)
 
 
 def solve_spherical_model(case_index, lb, ub):

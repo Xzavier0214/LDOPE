@@ -124,6 +124,9 @@ cartesian_individual_type = ctypes.c_double * CARTESIAN_INDIVIDUAL_SIZE
 du_c = ctypes.c_double(DU)
 mu_c = ctypes.c_double(MU)
 tu_c = ctypes.c_double(TU)
+du_c_norm = ctypes.c_double(1)
+mu_c_norm = ctypes.c_double(1)
+tu_c_norm = ctypes.c_double(1)
 
 tm_p_c = ctypes.c_double(TM_P)
 tm_e_c = ctypes.c_double(TM_E)
@@ -181,13 +184,36 @@ def spherical_control_fcn(state, costate, flag='p'):
     return tuple(control_c)
 
 
+def spherical_state_fcn(state, control, side='p', norm=True):
+    state_c = spherical_state_type(*state)
+    control_c = spherical_control_type(*control)
+    dot_state_c = spherical_state_type()
+
+    if side == 'p':
+        if norm:
+            ldope.spherical_state_fcn(state_c, control_c, tm_p_c_norm,
+                                      mu_c_norm, dot_state_c)
+        else:
+            ldope.spherical_state_fcn(state_c, control_c, tm_p_c, mu_c,
+                                      dot_state_c)
+    elif side == 'e':
+        if norm:
+            ldope.spherical_state_fcn(state_c, control_c, tm_e_c_norm,
+                                      mu_c_norm, dot_state_c)
+        else:
+            ldope.spherical_state_fcn(state_c, control_c, tm_e_c, mu_c,
+                                      dot_state_c)
+
+    return tuple(dot_state_c)
+
+
 def spherical_ext_state_fcn(ext_state, norm=True):
     ext_state_c = spherical_ext_state_type(*ext_state)
     dot_ext_state_c = spherical_ext_state_type()
 
     if norm:
         ldope.spherical_ext_state_fcn(ext_state_c, tm_p_c_norm, tm_e_c_norm,
-                                      ctypes.c_double(1), dot_ext_state_c)
+                                      mu_c_norm, dot_ext_state_c)
     else:
         ldope.spherical_ext_state_fcn(ext_state_c, tm_p_c, tm_e_c, mu_c,
                                       dot_ext_state_c)
@@ -214,7 +240,7 @@ def cartesian_ext_state_fcn(ext_state, norm=True):
 
     if norm:
         ldope.cartesian_ext_state_fcn(ext_state_c, tm_p_c_norm, tm_e_c_norm,
-                                      ctypes.c_double(1), dot_ext_state_c)
+                                      mu_c_norm, dot_ext_state_c)
     else:
         ldope.cartesian_ext_state_fcn(ext_state_c, tm_p_c, tm_e_c, mu_c,
                                       dot_ext_state_c)

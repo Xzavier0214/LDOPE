@@ -67,7 +67,7 @@ def plot_control_frame(num):
 
 
 # 绘制时间-距离坐标轴
-def plot_tr_frame(num, norm=True):
+def plot_td_frame(num, norm=True):
     fig = plt.figure(num)
     ax = fig.gca()
 
@@ -89,3 +89,45 @@ def plot_tr_frame(num, norm=True):
     ax.grid()
 
     return fig, ax
+
+
+# 绘制时间-半径坐标轴
+def plot_tr_frame(num):
+    fig, (ax_p, ax_e) = plt.subplots(2, 1, num=num)
+
+    ax_p.set_xlabel(r'$\bar{t}$' + r' (normalized time)')
+    ax_p.set_ylabel(r'$\bar{r}$' + r' (normalized radius)')
+    ax_e.set_xlabel(r'$\bar{t}$' + r' (normalized time)')
+    ax_e.set_ylabel(r'$\bar{r}$' + r' (normalized radius)')
+
+    return fig, (ax_p, ax_e)
+
+
+# 绘制时间-纬度坐标轴
+def plot_tphi_frame(num):
+    fig, (ax_p, ax_e) = plt.subplots(2, 1, num=num)
+
+    ax_p.set_xlabel(r'$\bar{t}$' + r' (normalized time)')
+    ax_p.set_ylabel(r'$\varphi$' + r' (latitude)')
+    ax_e.set_xlabel(r'$\bar{t}$' + r' (normalized time)')
+    ax_e.set_ylabel(r'$\varphi$' + r' (latitude)')
+
+    return fig, (ax_p, ax_e)
+
+
+# 绘制时间-经度坐标轴
+def plot_txi_frame(num, modified=False):
+    fig, (ax_p, ax_e) = plt.subplots(2, 1, num=num)
+
+    if modified:
+        ax_p.set_xlabel(r'$\bar{t}$' + r' (normalized time)')
+        ax_p.set_ylabel(r'$\hat{\xi}$' + r' (absolute longitude)')
+        ax_e.set_xlabel(r'$\bar{t}$' + r' (normalized time)')
+        ax_e.set_ylabel(r'$\hat{\xi}$' + r' (absolute longitude)')
+    else:
+        ax_p.set_xlabel(r'$\bar{t}$' + r' (normalized time)')
+        ax_p.set_ylabel(r'$\xi$' + r' (absolute longitude)')
+        ax_e.set_xlabel(r'$\bar{t}$' + r' (normalized time)')
+        ax_e.set_ylabel(r'$\xi$' + r' (absolute longitude)')
+
+    return fig, (ax_p, ax_e)

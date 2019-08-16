@@ -104,14 +104,13 @@ def plot_cartesian_trajectory(case_index,
     # 绘制向量计算
     xp, yp, zp = [], [], []
     xe, ye, ze = [], [], []
-    for i in range(len(result.t)):
-        split_state = result.y.T[i]
-        xp.append(split_state[0])
-        yp.append(split_state[1])
-        zp.append(split_state[2])
-        xe.append(split_state[6])
-        ye.append(split_state[7])
-        ze.append(split_state[8])
+    for each_state in result.y.T:
+        xp.append(each_state[0])
+        yp.append(each_state[1])
+        zp.append(each_state[2])
+        xe.append(each_state[6])
+        ye.append(each_state[7])
+        ze.append(each_state[8])
 
     # 绘制
     ax.plot(xp, yp, zp, color=p_color, linestyle=p_linestyle, label=p_label)
@@ -157,15 +156,15 @@ def plot_cartesian_control(case_index,
     alpha_p, alpha_e = [], []
     beta_p, beta_e = [], []
     for i, t in enumerate(result.t):
-        split_state = result.y.T[i]
+        each_state = result.y.T[i]
         t_line.append(t)
-        control_p = ldope.cartesian_control_fcn(split_state[0:6],
-                                                split_state[12:18], 'p')
+        control_p = ldope.cartesian_control_fcn(each_state[0:6],
+                                                each_state[12:18], 'p')
         alpha_p.append(control_p[0])
         beta_p.append(control_p[1])
 
-        control_e = ldope.cartesian_control_fcn(split_state[6:12],
-                                                split_state[18:24], 'e')
+        control_e = ldope.cartesian_control_fcn(each_state[6:12],
+                                                each_state[18:24], 'e')
         alpha_e.append(control_e[0])
         beta_e.append(control_e[1])
 
@@ -204,13 +203,13 @@ def plot_cartesian_control(case_index,
 
 
 # 绘制时间-距离
-def plot_cartesian_tr(case_index,
+def plot_cartesian_td(case_index,
                       individual,
                       ax,
                       norm=True,
                       color=seaborn.xkcd_rgb['red'],
                       linestyle='-',
-                      label='t vs. r'):
+                      label='t vs. D'):
     # 初始状态量
     state_p0 = solve_cartesian_model.CASES[case_index - 1][0]
     state_e0 = solve_cartesian_model.CASES[case_index - 1][1]
@@ -246,13 +245,13 @@ def plot_cartesian_tr(case_index,
     t_line = []
     for i, t in enumerate(result.t):
         t_line.append(t)
-        split_state = result.y.T[i]
-        xp = split_state[0]
-        yp = split_state[1]
-        zp = split_state[2]
-        xe = split_state[6]
-        ye = split_state[7]
-        ze = split_state[8]
+        each_state = result.y.T[i]
+        xp = each_state[0]
+        yp = each_state[1]
+        zp = each_state[2]
+        xe = each_state[6]
+        ye = each_state[7]
+        ze = each_state[8]
         r.append(sqrt((xp - xe)**2 + (yp - ye)**2 + (zp - ze)**2))
 
     # 绘制
@@ -295,14 +294,14 @@ if __name__ == "__main__":
                            ax2_alpha, ax_control_beta, ax2_beta)
 
     # 绘制时间-距离坐标轴
-    fig_tr_norm, ax_tr_norm = plot_util.plot_tr_frame(
+    fig_tr_norm, ax_tr_norm = plot_util.plot_td_frame(
         'case {} tr norm frame'.format(case_index), True)
-    fig_tr, ax_tr = plot_util.plot_tr_frame(
+    fig_tr, ax_tr = plot_util.plot_td_frame(
         'case {} tr frame'.format(case_index), False)
 
     # 绘制时间-距离图
-    plot_cartesian_tr(case_index, individual_norm, ax_tr_norm, True)
-    plot_cartesian_tr(case_index, individual, ax_tr, False)
+    plot_cartesian_td(case_index, individual_norm, ax_tr_norm, True)
+    plot_cartesian_td(case_index, individual, ax_tr, False)
 
     # 显示图例
     ax_norm.legend()

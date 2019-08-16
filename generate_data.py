@@ -1,5 +1,5 @@
-from spherical_solve import spherical_solve
-from cartesian_solve import cartesian_solve
+from solve_spherical_model import solve_spherical_model
+from solve_cartesian_model import solve_cartesian_model
 
 if __name__ == "__main__":
 
@@ -10,11 +10,21 @@ if __name__ == "__main__":
                     1)
     cartesian_ub = (10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 5)
 
-    for _ in range(100):
-        for case_index in range(1, 4):
-            spherical_solve(case_index, spherical_lb, spherical_ub)
-            cartesian_solve(case_index, cartesian_lb, cartesian_ub, True)
+    # for _ in range(100):
+    #     for case_index in range(1, 4):
+    #         solve_spherical_model(case_index, spherical_lb, spherical_ub)
+    #         solve_cartesian_model(case_index, cartesian_lb, cartesian_ub,
+    #                               True)
 
     # for _ in range(100):
     #     for case_index in range(1, 4):
-    #         cartesian_solve(case_index, cartesian_lb, cartesian_ub, False)
+    #         solve_cartesian_model(case_index, cartesian_lb, cartesian_ub,
+    #                               False)
+
+    # for _ in range(10):
+    #     for case_index in range(4, 7):
+    #         solve_spherical_model(case_index, spherical_lb, spherical_ub)
+
+    for _ in range(10):
+        solve_spherical_model(7, spherical_lb, spherical_ub)
+        solve_cartesian_model(4, cartesian_lb, cartesian_ub)

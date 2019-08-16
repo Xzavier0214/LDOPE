@@ -42,33 +42,33 @@ plot_spherical_result.plot_spherical_trajectory(
     e_linestyle=':')
 
 # 绘制时间-距离坐标轴
-fig_tr_norm, ax_tr_norm = plot_util.plot_tr_frame(
+fig_td_norm, ax_td_norm = plot_util.plot_td_frame(
     'case {} tr norm frame'.format(case_index), True)
-fig_tr, ax_tr = plot_util.plot_tr_frame('case {} tr frame'.format(case_index),
+fig_td, ax_td = plot_util.plot_td_frame('case {} tr frame'.format(case_index),
                                         False)
 
 # 绘制时间-距离图
-plot_cartesian_result.plot_cartesian_tr(case_index, cartesian_individual_norm,
-                                        ax_tr_norm, True)
-plot_cartesian_result.plot_cartesian_tr(case_index, cartesian_individual,
-                                        ax_tr, False)
-plot_spherical_result.plot_spherical_tr(case_index,
+plot_cartesian_result.plot_cartesian_td(case_index, cartesian_individual_norm,
+                                        ax_td_norm, True)
+plot_cartesian_result.plot_cartesian_td(case_index, cartesian_individual,
+                                        ax_td, False)
+plot_spherical_result.plot_spherical_td(case_index,
                                         spherical_individual_norm,
-                                        ax_tr_norm,
+                                        ax_td_norm,
                                         True,
                                         color=seaborn.xkcd_rgb['purple'],
                                         linestyle='-.')
-plot_spherical_result.plot_spherical_tr(case_index,
+plot_spherical_result.plot_spherical_td(case_index,
                                         spherical_individual,
-                                        ax_tr,
+                                        ax_td,
                                         False,
                                         color=seaborn.xkcd_rgb['purple'],
                                         linestyle='-.')
 
 # 调整图比例
 fig.tight_layout()
-fig_tr_norm.tight_layout()
-fig_tr.tight_layout()
+fig_td_norm.tight_layout()
+fig_td.tight_layout()
 
 # 显示
 plt.show()
