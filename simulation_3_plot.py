@@ -26,21 +26,21 @@ plot_spherical_result.plot_spherical_initial_point(
     ax_p,
     True,
     p_color=seaborn.xkcd_rgb['red'],
-    p_label='Initial Position P1',
+    p_label='Initial Position P4',
     side='p')
 plot_spherical_result.plot_spherical_initial_point(
     5,
     ax_p,
     True,
     p_color=seaborn.xkcd_rgb['green'],
-    p_label='Initial Position P2',
+    p_label='Initial Position P5',
     side='p')
 plot_spherical_result.plot_spherical_initial_point(
     6,
     ax_p,
     True,
     p_color=seaborn.xkcd_rgb['blue'],
-    p_label='Initial Position P3',
+    p_label='Initial Position P6',
     side='p')
 
 plot_spherical_result.plot_spherical_initial_point(
@@ -48,21 +48,21 @@ plot_spherical_result.plot_spherical_initial_point(
     ax_e,
     True,
     e_color=seaborn.xkcd_rgb['red'],
-    e_label='Initial Position E1',
+    e_label='Initial Position E4',
     side='e')
 plot_spherical_result.plot_spherical_initial_point(
     5,
     ax_e,
     True,
     e_color=seaborn.xkcd_rgb['green'],
-    e_label='Initial Position E2',
+    e_label='Initial Position E5',
     side='e')
 plot_spherical_result.plot_spherical_initial_point(
     6,
     ax_e,
     True,
     e_color=seaborn.xkcd_rgb['blue'],
-    e_label='Initial Position E3',
+    e_label='Initial Position E6',
     side='e')
 
 # 绘制轨迹
@@ -72,7 +72,7 @@ plot_spherical_result.plot_spherical_trajectory(
     ax_p,
     True,
     p_color=seaborn.xkcd_rgb['red'],
-    p_label='Trajectory P1',
+    p_label='Trajectory P4',
     p_linestyle='-',
     side='p')
 plot_spherical_result.plot_spherical_trajectory(
@@ -81,7 +81,7 @@ plot_spherical_result.plot_spherical_trajectory(
     ax_p,
     True,
     p_color=seaborn.xkcd_rgb['green'],
-    p_label='Trajectory P2',
+    p_label='Trajectory P5',
     p_linestyle='--',
     side='p')
 plot_spherical_result.plot_spherical_trajectory(
@@ -90,7 +90,7 @@ plot_spherical_result.plot_spherical_trajectory(
     ax_p,
     True,
     p_color=seaborn.xkcd_rgb['blue'],
-    p_label='Trajectory P3',
+    p_label='Trajectory P6',
     p_linestyle='-.',
     side='p')
 
@@ -100,7 +100,7 @@ plot_spherical_result.plot_spherical_trajectory(
     ax_e,
     True,
     e_color=seaborn.xkcd_rgb['red'],
-    e_label='Trajectory E1',
+    e_label='Trajectory E4',
     e_linestyle='-',
     side='e')
 plot_spherical_result.plot_spherical_trajectory(
@@ -109,7 +109,7 @@ plot_spherical_result.plot_spherical_trajectory(
     ax_e,
     True,
     e_color=seaborn.xkcd_rgb['green'],
-    e_label='Trajectory E2',
+    e_label='Trajectory E5',
     e_linestyle='--',
     side='e')
 plot_spherical_result.plot_spherical_trajectory(
@@ -118,12 +118,12 @@ plot_spherical_result.plot_spherical_trajectory(
     ax_e,
     True,
     e_color=seaborn.xkcd_rgb['blue'],
-    e_label='Trajectory E3',
+    e_label='Trajectory E6',
     e_linestyle='-.',
     side='e')
 
 # 绘制时间-半径坐标轴
-fig_tr, (ax_tr_p, ax_tr_e) = plot_util.plot_tr_frame('t vs. r')
+fig_tr, (ax_tr_p, ax_tr_e) = plot_util.plot_tr_frame(r't vs. $\bar{r}')
 
 # 绘制时间-半径
 plot_spherical_result.plot_spherical_tr(4,
@@ -132,8 +132,8 @@ plot_spherical_result.plot_spherical_tr(4,
                                         ax_tr_e,
                                         p_color=seaborn.xkcd_rgb['red'],
                                         e_color=seaborn.xkcd_rgb['red'],
-                                        p_label='P1 r',
-                                        e_label='E1 r',
+                                        p_label=r'P4 $\bar{r}$',
+                                        e_label=r'E4 $\bar{r}$',
                                         p_linestyle='-',
                                         e_linestyle='-')
 plot_spherical_result.plot_spherical_tr(5,
@@ -142,8 +142,8 @@ plot_spherical_result.plot_spherical_tr(5,
                                         ax_tr_e,
                                         p_color=seaborn.xkcd_rgb['green'],
                                         e_color=seaborn.xkcd_rgb['green'],
-                                        p_label='P2 r',
-                                        e_label='E2 r',
+                                        p_label=r'P5 $\bar{r}$',
+                                        e_label=r'E5 $\bar{r}$',
                                         p_linestyle='--',
                                         e_linestyle='--')
 plot_spherical_result.plot_spherical_tr(6,
@@ -152,8 +152,8 @@ plot_spherical_result.plot_spherical_tr(6,
                                         ax_tr_e,
                                         p_color=seaborn.xkcd_rgb['blue'],
                                         e_color=seaborn.xkcd_rgb['blue'],
-                                        p_label='P3 r',
-                                        e_label='E3 r',
+                                        p_label=r'P6 $\bar{r}$',
+                                        e_label=r'E6 $\bar{r}$',
                                         p_linestyle='-.',
                                         e_linestyle='-.')
 
@@ -168,8 +168,8 @@ plot_spherical_result.plot_spherical_tphi(4,
                                           ax_tphi_e,
                                           p_color=seaborn.xkcd_rgb['red'],
                                           e_color=seaborn.xkcd_rgb['red'],
-                                          p_label=r'P1 $\varphi$',
-                                          e_label=r'E1 $\varphi$',
+                                          p_label=r'P4 $\varphi$',
+                                          e_label=r'E4 $\varphi$',
                                           p_linestyle='-',
                                           e_linestyle='-')
 plot_spherical_result.plot_spherical_tphi(5,
@@ -178,8 +178,8 @@ plot_spherical_result.plot_spherical_tphi(5,
                                           ax_tphi_e,
                                           p_color=seaborn.xkcd_rgb['green'],
                                           e_color=seaborn.xkcd_rgb['green'],
-                                          p_label=r'P2 $\varphi$',
-                                          e_label=r'E2 $\varphi$',
+                                          p_label=r'P5 $\varphi$',
+                                          e_label=r'E5 $\varphi$',
                                           p_linestyle='--',
                                           e_linestyle='--')
 plot_spherical_result.plot_spherical_tphi(6,
@@ -188,8 +188,8 @@ plot_spherical_result.plot_spherical_tphi(6,
                                           ax_tphi_e,
                                           p_color=seaborn.xkcd_rgb['blue'],
                                           e_color=seaborn.xkcd_rgb['blue'],
-                                          p_label=r'P3 $\varphi$',
-                                          e_label=r'E3 $\varphi$',
+                                          p_label=r'P6 $\varphi$',
+                                          e_label=r'E6 $\varphi$',
                                           p_linestyle='-.',
                                           e_linestyle='-.')
 
@@ -203,8 +203,8 @@ plot_spherical_result.plot_spherical_txi(4,
                                          ax_txi_e,
                                          p_color=seaborn.xkcd_rgb['red'],
                                          e_color=seaborn.xkcd_rgb['red'],
-                                         p_label=r'P1 $\xi$',
-                                         e_label=r'E1 $\xi$',
+                                         p_label=r'P4 $\xi$',
+                                         e_label=r'E4 $\xi$',
                                          p_linestyle='-',
                                          e_linestyle='-')
 plot_spherical_result.plot_spherical_txi(5,
@@ -213,8 +213,8 @@ plot_spherical_result.plot_spherical_txi(5,
                                          ax_txi_e,
                                          p_color=seaborn.xkcd_rgb['green'],
                                          e_color=seaborn.xkcd_rgb['green'],
-                                         p_label=r'P2 $\xi$',
-                                         e_label=r'E2 $\xi$',
+                                         p_label=r'P5 $\xi$',
+                                         e_label=r'E5 $\xi$',
                                          p_linestyle='--',
                                          e_linestyle='--')
 plot_spherical_result.plot_spherical_txi(6,
@@ -223,8 +223,8 @@ plot_spherical_result.plot_spherical_txi(6,
                                          ax_txi_e,
                                          p_color=seaborn.xkcd_rgb['blue'],
                                          e_color=seaborn.xkcd_rgb['blue'],
-                                         p_label=r'P3 $\xi$',
-                                         e_label=r'E3 $\xi$',
+                                         p_label=r'P6 $\xi$',
+                                         e_label=r'E6 $\xi$',
                                          p_linestyle='-.',
                                          e_linestyle='-.')
 
@@ -240,8 +240,8 @@ plot_spherical_result.plot_spherical_txi(4,
                                          ax_txi_e_modified,
                                          p_color=seaborn.xkcd_rgb['red'],
                                          e_color=seaborn.xkcd_rgb['red'],
-                                         p_label=r'P1 $\hat{\xi}$',
-                                         e_label=r'E1 $\hat{\xi}$',
+                                         p_label=r'P4 $\hat{\xi}$',
+                                         e_label=r'E4 $\hat{\xi}$',
                                          p_linestyle='-',
                                          e_linestyle='-',
                                          p_base_xi=0,
@@ -252,8 +252,8 @@ plot_spherical_result.plot_spherical_txi(5,
                                          ax_txi_e_modified,
                                          p_color=seaborn.xkcd_rgb['green'],
                                          e_color=seaborn.xkcd_rgb['green'],
-                                         p_label=r'P2 $\hat{\xi}$',
-                                         e_label=r'E2 $\hat{\xi}$',
+                                         p_label=r'P5 $\hat{\xi}$',
+                                         e_label=r'E5 $\hat{\xi}$',
                                          p_linestyle='--',
                                          e_linestyle='--',
                                          p_base_xi=deg2rad(20),
@@ -264,8 +264,8 @@ plot_spherical_result.plot_spherical_txi(6,
                                          ax_txi_e_modified,
                                          p_color=seaborn.xkcd_rgb['blue'],
                                          e_color=seaborn.xkcd_rgb['blue'],
-                                         p_label=r'P3 $\hat{\xi}$',
-                                         e_label=r'E3 $\hat{\xi}$',
+                                         p_label=r'P6 $\hat{\xi}$',
+                                         e_label=r'E6 $\hat{\xi}$',
                                          p_linestyle='-.',
                                          e_linestyle='-.',
                                          p_base_xi=deg2rad(40),
@@ -280,21 +280,21 @@ plot_spherical_result.plot_spherical_initial_point(
     ax_same,
     True,
     p_color=seaborn.xkcd_rgb['red'],
-    p_label='Initial Position P2',
+    p_label='Initial Position P5',
     e_color=seaborn.xkcd_rgb['green'],
-    e_label='Initial Position E2')
+    e_label='Initial Position E5')
 
 # 绘制相同控制
 plot_spherical_result.plot_same_control(5, spherical_individual_norm_5, 6,
                                         spherical_individual_norm_6, ax_same,
-                                        p_o_label='P2 Origin',
-                                        e_o_label='E2 Origin',
-                                        p_label='P2 in P3 Controller',
-                                        e_label='E2 in E3 Controller')
+                                        p_o_label='P5 Origin',
+                                        e_o_label='E5 Origin',
+                                        p_label='P5 in P6 Controller',
+                                        e_label='E5 in E6 Controller')
 
 # 显示图例
-ax_p.legend()
-ax_e.legend()
+ax_p.legend(loc='upper right')
+ax_e.legend(loc='upper right')
 ax_tr_p.legend()
 ax_tphi_p.legend()
 ax_txi_p.legend()
@@ -303,7 +303,7 @@ ax_tr_e.legend()
 ax_tphi_e.legend()
 ax_txi_e.legend()
 ax_txi_e_modified.legend()
-ax_same.legend()
+ax_same.legend(loc='upper right')
 
 # 调整图比例
 fig_p.tight_layout()

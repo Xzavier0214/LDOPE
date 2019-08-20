@@ -50,10 +50,47 @@ plot_spherical_result.plot_spherical_control(
     spherical_index, spherical_individual_norm, ax_control_alpha_p_s,
     ax_control_alpha_e_s, ax_control_beta_p_s, ax_control_beta_e_s)
 
-fig_c.legend(bbox_to_anchor=(1.05, 0), loc=3, borderaxespad=0)
-fig_s.legend(bbox_to_anchor=(1.05, 0), loc=3, borderaxespad=0)
-fig_control_c.legend(bbox_to_anchor=(1.05, 0), loc=3, borderaxespad=0)
-fig_control_s.legend(bbox_to_anchor=(1.05, 0), loc=3, borderaxespad=0)
+# 绘制图例
+ax_c.legend(loc='upper right')
+ax_s.legend(loc='upper right')
+
+x_locator = plt.MultipleLocator(0.5)
+
+xlim = (ax_control_alpha_p_c.get_xlim())
+new_xlim = [xlim[0], xlim[1] + 0.5]
+ax_control_alpha_p_c.xaxis.set_major_locator(x_locator)
+ax_control_alpha_e_c.xaxis.set_major_locator(x_locator)
+ax_control_alpha_p_c.set_xlim(new_xlim)
+ax_control_alpha_e_c.set_xlim(new_xlim)
+ax_control_alpha_p_c.legend(loc='upper right')
+ax_control_alpha_e_c.legend(bbox_to_anchor=[1, 0.8])
+
+xlim = (ax_control_beta_p_c.get_xlim())
+new_xlim = [xlim[0], xlim[1] + 0.5]
+ax_control_beta_p_c.xaxis.set_major_locator(x_locator)
+ax_control_beta_e_c.xaxis.set_major_locator(x_locator)
+ax_control_beta_p_c.set_xlim(new_xlim)
+ax_control_beta_e_c.set_xlim(new_xlim)
+ax_control_beta_p_c.legend(loc='upper right')
+ax_control_beta_e_c.legend(bbox_to_anchor=[1, 0.8])
+
+xlim = (ax_control_alpha_p_s.get_xlim())
+new_xlim = [xlim[0], xlim[1] + 0.6]
+ax_control_alpha_p_s.xaxis.set_major_locator(x_locator)
+ax_control_alpha_e_s.xaxis.set_major_locator(x_locator)
+ax_control_alpha_p_s.set_xlim(new_xlim)
+ax_control_alpha_e_s.set_xlim(new_xlim)
+ax_control_alpha_p_s.legend(loc='upper right')
+ax_control_alpha_e_s.legend(bbox_to_anchor=[1, 0.8])
+
+xlim = (ax_control_beta_p_s.get_xlim())
+new_xlim = [xlim[0], xlim[1] + 0.6]
+ax_control_beta_p_s.xaxis.set_major_locator(x_locator)
+ax_control_beta_e_s.xaxis.set_major_locator(x_locator)
+ax_control_beta_p_s.set_xlim(new_xlim)
+ax_control_beta_e_s.set_xlim(new_xlim)
+ax_control_beta_p_s.legend(loc='upper right')
+ax_control_beta_e_s.legend(bbox_to_anchor=[1, 0.78])
 
 # 调整图比例
 fig_c.tight_layout()

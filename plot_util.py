@@ -67,28 +67,24 @@ def plot_control_frame(num):
 
 
 # 绘制时间-距离坐标轴
-def plot_td_frame(num, norm=True):
+def plot_td_frame(num):
     fig = plt.figure(num)
-    ax = fig.gca()
+    ax_norm = fig.gca()
+    ax_without = ax_norm.twinx()
 
-    if norm:
-        ax.set_xlabel(r'$\bar{t}$' + r' (normalized time)')
-        ax.set_ylabel(r'$\bar{D}$' + r' (normalized distance)')
-    else:
-        ax.set_xlabel(r'$t$' + r' (time)')
-        ax.set_ylabel(r'$D$' + r' (distance)')
+    ax_norm.set_xlabel(r'$\bar{t}$' + r' (normalized time)')
+    ax_norm.set_ylabel(r'$\bar{D}$' + r' (normalized distance)')
+    ax_without.set_ylabel(r'$D$' + r' (distance)')
 
-    if not norm:
-        formatter = ticker.ScalarFormatter(useMathText=True)
-        formatter.set_scientific(True)
-        formatter.set_powerlimits((-1, 2))
+    formatter = ticker.ScalarFormatter(useMathText=True)
+    formatter.set_scientific(True)
+    formatter.set_powerlimits((-1, 2))
 
-        ax.xaxis.set_major_formatter(formatter)
-        ax.yaxis.set_major_formatter(formatter)
+    ax_without.yaxis.set_major_formatter(formatter)
 
-    ax.grid()
+    ax_norm.grid()
 
-    return fig, ax
+    return fig, (ax_norm, ax_without)
 
 
 # 绘制时间-半径坐标轴
@@ -99,6 +95,9 @@ def plot_tr_frame(num):
     ax_p.set_ylabel(r'$\bar{r}$' + r' (normalized radius)')
     ax_e.set_xlabel(r'$\bar{t}$' + r' (normalized time)')
     ax_e.set_ylabel(r'$\bar{r}$' + r' (normalized radius)')
+
+    ax_p.grid()
+    ax_e.grid()
 
     return fig, (ax_p, ax_e)
 
@@ -111,6 +110,9 @@ def plot_tphi_frame(num):
     ax_p.set_ylabel(r'$\varphi$' + r' (latitude)')
     ax_e.set_xlabel(r'$\bar{t}$' + r' (normalized time)')
     ax_e.set_ylabel(r'$\varphi$' + r' (latitude)')
+
+    ax_p.grid()
+    ax_e.grid()
 
     return fig, (ax_p, ax_e)
 
@@ -129,5 +131,8 @@ def plot_txi_frame(num, modified=False):
         ax_p.set_ylabel(r'$\xi$' + r' (absolute longitude)')
         ax_e.set_xlabel(r'$\bar{t}$' + r' (normalized time)')
         ax_e.set_ylabel(r'$\xi$' + r' (absolute longitude)')
+
+    ax_p.grid()
+    ax_e.grid()
 
     return fig, (ax_p, ax_e)

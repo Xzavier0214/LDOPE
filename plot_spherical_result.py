@@ -262,7 +262,10 @@ def plot_spherical_td(case_index,
     r = []
     t_line = []
     for i, t in enumerate(result.t):
-        t_line.append(t)
+        if norm:
+            t_line.append(t)
+        else:
+            t_line.append(t / ldope.TU)
         each_state = result.y.T[i]
         r_p, r_e = each_state[0], each_state[6]
         xi_p, xi_e = each_state[3], each_state[9]

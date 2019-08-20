@@ -244,7 +244,10 @@ def plot_cartesian_td(case_index,
     r = []
     t_line = []
     for i, t in enumerate(result.t):
-        t_line.append(t)
+        if norm:
+            t_line.append(t)
+        else:
+            t_line.append(t / ldope.TU)
         each_state = result.y.T[i]
         xp = each_state[0]
         yp = each_state[1]

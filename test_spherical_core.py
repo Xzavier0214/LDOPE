@@ -10,6 +10,8 @@ print(platform)
 
 if platform == 'darwin':
     ldope = ctypes.CDLL('./lib/libldope.dylib')
+elif platform == 'win32':
+    ldope = ctypes.CDLL('./lib/libldope.dll')
 
 print(ldope)
 
